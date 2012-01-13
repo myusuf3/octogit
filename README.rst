@@ -13,4 +13,4 @@ Installation
 ============
 
 To install requirements::
-    $ pip install -r requiremnts.txt
+$ pip install -r requiremnts.txt
