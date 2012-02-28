@@ -1,8 +1,9 @@
+#!/usr/bin/env python
 
 try:
-        from setuptools import setup
+    from setuptools import setup
 except ImportError:
-        from distutils.core import setup
+    from distutils.core import setup
 
 
 dependencies = ['clint>=0.2.1', 'requests']
