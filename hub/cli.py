@@ -10,8 +10,10 @@ from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
+#username  =
+#password =
 
-def help():
+def get_help():
     puts('How to hub:')
     with indent(4):
         puts(colored.cyan('hub create <repo>'))
@@ -23,6 +25,9 @@ def version():
 
 def git_status():
     print git.status()
+
+def get_issues():
+    pass
 
 def show_boating():
     puts('{0} by Mahdi Yusuf <@myusuf3>'.format(colored.yellow('hub')))
@@ -36,11 +41,14 @@ def begin():
 
     elif args.get(0) == None:
         show_boating()
-    
+
     elif args.get(0) == 'status':
-       git_status()
-       sys.exit(0)
+        git_status()
+        sys.exit(0)
 
     elif args.flags.contains(('--help', '-h')):
-        help()
+        get_help()
         sys.exit(0)
+
+    elif args.flags.contains('--issues', '-i', 'issues'):
+        get_issues()
