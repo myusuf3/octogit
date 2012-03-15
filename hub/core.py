@@ -28,4 +28,4 @@ def get_issues(user, repo):
         puts(issue_info)
 
 if __name__ == '__main__':
-    exit(get_issues('myusuf3','courtside'))
+    exit(get_issues('github','hubot'))
