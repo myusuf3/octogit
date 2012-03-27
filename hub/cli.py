@@ -36,11 +36,9 @@ def begin():
 
     elif args.get(0) == None:
         show_boating()
-    
     elif args.get(0) == 'status':
        git_status()
        sys.exit(0)
-
     elif args.flags.contains(('--help', '-h')):
         help()
         sys.exit(0)
