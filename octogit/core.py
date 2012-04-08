@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-hub
+octogit
 
-this file contains github api stuff
+This file contains stuff for github api
 """
 
 

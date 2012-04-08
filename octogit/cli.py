@@ -1,7 +1,7 @@
 """
-hub
+octogit
 
-this file contains all the helper cli commands for hub
+this file contains all the helper cli commands for octogit
 
 """
 import sys
@@ -10,15 +10,13 @@ from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
-#username  =
-#password =
 
 def get_help():
-    puts('How to hub:')
+    puts('How to octogit:')
     with indent(4):
-        puts(colored.cyan('hub create <repo>'))
-        puts(colored.cyan('hub delete <repo>'))
-        puts(colored.cyan('hub pull <repo>'))
+        puts(colored.cyan('octogit create <repo>'))
+        puts(colored.cyan('octogit delete <repo>'))
+        puts(colored.cyan('octogit pull <repo>'))
 
 def version():
     puts('development 0.0.1')
@@ -31,7 +29,7 @@ def get_issues():
 
 def show_boating():
     puts('{0} by Mahdi Yusuf <@myusuf3>'.format(colored.yellow('hub')))
-    puts('{0} http://github.com/myusuf3/hub'.format(colored.yellow('source')))
+    puts('{0} http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
 
 
 def begin():
