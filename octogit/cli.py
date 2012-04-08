@@ -18,17 +18,21 @@ def get_help():
         puts(colored.cyan('octogit delete <repo>'))
         puts(colored.cyan('octogit pull <repo>'))
 
+
 def version():
     puts('development 0.0.1')
+
 
 def git_status():
     print git.status()
 
+
 def get_issues():
     pass
 
+
 def show_boating():
-    puts('{0} by Mahdi Yusuf <@myusuf3>'.format(colored.yellow('hub')))
+    puts('{0} by Mahdi Yusuf <@myusuf3>'.format(colored.yellow('octogit')))
     puts('{0} http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
 
 
