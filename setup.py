@@ -9,19 +9,19 @@ except ImportError:
 dependencies = ['clint>=0.2.1', 'requests']
 
 setup(
-    name='hub',
+    name='octogit',
     version='0.1dev',
-    description='simple interface for creating repositories and other things',
-    url='https://github.com/myusuf3/hub',
+    description='giving git tentacles to work better with github',
+    url='https://github.com/myusuf3/octogit',
     author='Mahdi Yusuf',
     author_email='yusuf.mahdi@gmail.com',
     install_requires=dependencies,
-    packages=['hub',],
+    packages=['octogit', ],
     license='MIT License',
     long_description=open('README.rst').read(),
-    entry_points = {
+    entry_points={
         'console_scripts': [
-            'hub = hub.cli:begin',
+            'octogit = octogit.cli:begin',
         ],
     },
     )
