@@ -37,6 +37,7 @@ ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
 
 def get_issues(user, repo):
     url = ISSUES_ENDPOINT % (user, repo)
+    print url 
     connect = urllib.urlopen(url)
     json_data = simplejson.load(connect)
     try:
