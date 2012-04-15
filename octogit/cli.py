@@ -12,15 +12,19 @@ from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
-from .core import get_repository, get_issues
+from .core import get_repository, get_issues, get_single_issue
 
 
 def get_help():
-    puts('How to octogit:')
+    puts('{0}.'.format(colored.blue('octogit')))
+    puts('\n{0}:'.format(colored.cyan('tentacles')))
     with indent(4):
-        puts(colored.cyan('octogit create <repo>'))
-        puts(colored.cyan('octogit delete <repo>'))
-        puts(colored.cyan('octogit pull <repo>'))
+        puts(colored.green('octogit login'))
+        puts(colored.green('octogit create <repo>'))
+        puts(colored.green('octogit delete <repo>'))
+        puts(colored.green('octogit issues'))
+        puts(colored.green('octogit issues <number>'))
+        puts('\n')
 
 
 def version():
@@ -52,8 +56,8 @@ def get_username_and_repo(url):
 
 
 def show_boating():
-    puts('{0} by Mahdi Yusuf <@myusuf3>'.format(colored.yellow('octogit')))
-    puts('{0} http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
+    puts('{0} by Mahdi Yusuf <{1}>'.format(colored.blue('octogit'), colored.cyan('@myusuf3')))
+    puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
 
 def find_github_remote(repository):
     remotes = repository.remotes
@@ -85,6 +89,11 @@ def begin():
         repo = get_repository()
         url = find_github_remote(repo)
         username, url = get_username_and_repo(url)
+        issue_number = int(args.get(1))
+        print issue_number
+        if issue_number:
+            get_single_issue(username, url, issue_number)
+            sys.exit(0)
         get_issues(username, url)
         sys.exit(0)
 
