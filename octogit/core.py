@@ -15,6 +15,10 @@ from clint.textui import colored, puts, indent
 from git import Repo
 
 
+ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
+SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
+
+
 def get_repository():
     get_top_level_repo = 'git rev-parse --show-toplevel'
     args = shlex.split(get_top_level_repo)
@@ -31,9 +35,19 @@ def get_repository():
         puts(colored.red('Not a git repository')) 
         sys.exit(0)
 
-
-
-ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
+def get_single_issue(user, repo, number):
+    url = SINGLE_ISSUE_ENDPOINT % (user, repo, number)
+    print url
+    import pdb; pdb.set_trace()
+    connect = urllib.urlopen(url)
+    json_data = simplejson.load(connect)
+    issue_info = '    '.join((
+            '{0}'.format(colored.green(json_data['number'])),
+            '{0}'.format(colored.red(json_data['user']['login'])),
+            '{0}'.format(json_data['title']),
+            '{0}'.format(json_data['body'])
+            ))
+    puts(issue_info)
 
 def get_issues(user, repo):
     url = ISSUES_ENDPOINT % (user, repo)
