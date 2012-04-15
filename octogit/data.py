@@ -1,12 +1,20 @@
 #!/usr/bin/python
 
 import os
+from ConfigParser import SafeConfigParser
 
-from clint import args
-from clint.textui import colored, puts, indent
+config = os.path.expander('~/.config/octogit/config.ini')
 
-HUB_CONFIG = os.path.expander('~/.config/octogit')
+parser = SafeConfigParser()
+
+try:
+	parser.read(config)
+except IOError:
+	parser.write(config, '')
+	parser.readfp(config)
+
+# add octogit section if not present
+if not parser.has_section('octogit'):
+	parser.add_section('octogit')
 
 
-def create_config_directory():
-    os.mkdir(HUB_CONFIG)
