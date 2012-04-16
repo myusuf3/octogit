@@ -12,7 +12,7 @@ from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
-from .core import get_repository, get_issues, get_single_issue
+from .core import get_repository, get_issues, get_single_issue, create_repository
 
 
 def get_help():
@@ -35,7 +35,6 @@ def git_status():
     print git.status()
 
 def get_username_and_repo(url):
-    import pdb; pdb.set_trace()
     # matching origin of this type 
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
@@ -85,13 +84,20 @@ def begin():
         get_help()
         sys.exit(0)
 
+    elif args.get(0) == 'create':
+        create_repository()
+        sys.exit()
+
     elif args.flags.contains(('--issues', '-i')) or args.get(0) == 'issues':
         repo = get_repository()
         url = find_github_remote(repo)
         username, url = get_username_and_repo(url)
-        issue_number = int(args.get(1))
-        print issue_number
-        if issue_number:
+        issue_number = None
+        try:
+            issue_number = int(args.get(1))
+        except:
+            pass
+        if issue_number is not None:
             get_single_issue(username, url, issue_number)
             sys.exit(0)
         get_issues(username, url)

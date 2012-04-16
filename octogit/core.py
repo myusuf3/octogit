@@ -4,20 +4,41 @@ octogit
 This file contains stuff for github api
 """
 
+import os
 import sys
 import shlex
 import urllib
 import subprocess
 
-
+import requests
 import simplejson
-from clint.textui import colored, puts, indent
+from clint.textui import colored, puts, indent, columns
 from git import Repo
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
 
+def create_octogit_readme():
+    pass
+
+
+def create_local_repo(repo_name):
+    # mkdir repo_name
+    repo_locaton = '/'.join([os.getcwd(), repo_name])
+    os.makedirs(repo_location)
+    # cd repo_name
+    os.chdir(repo_location)
+
+
+
+def create_repository():
+    import pdb; pdb.set_trace()
+    post_dict = {'name': 'Hello-World', 'description': 'This is your first repo','homepage': 'https://github.com', 'private': False, 'has_issues': True, 'has_wiki': True,'has_downloads': True}
+    r = requests.post('https://api.github.com/user/repos', auth=('myusuf3', ''), data=simplejson.dumps(post_dict))
+    if r.status_code == 201:
+        create_local_repo('Hello-World')
+    print r.text
 
 def get_repository():
     get_top_level_repo = 'git rev-parse --show-toplevel'
@@ -37,7 +58,6 @@ def get_repository():
 
 def get_single_issue(user, repo, number):
     url = SINGLE_ISSUE_ENDPOINT % (user, repo, number)
-    print url
     import pdb; pdb.set_trace()
     connect = urllib.urlopen(url)
     json_data = simplejson.load(connect)
@@ -51,7 +71,7 @@ def get_single_issue(user, repo, number):
 
 def get_issues(user, repo):
     url = ISSUES_ENDPOINT % (user, repo)
-    print url 
+    print url
     connect = urllib.urlopen(url)
     json_data = simplejson.load(connect)
     try:
@@ -63,11 +83,12 @@ def get_issues(user, repo):
     if len(json_data) == 0 :
         puts(colored.cyan('Yay! No issues yet...'))
         return
-    puts('Issues: ')
-    for i in json_data:
-        issue_info = '    '.join((
-                '{0}'.format(colored.yellow(i['number'])),
-                '{0}'.format(colored.yellow(i['user']['login'])),
-                '{0}'.format(i['title'])
-                ))
-        puts(issue_info)
+    puts('listing all {0} issues.'.format(colored.red(len(json_data))))
+    puts('\n')
+
+    for issue in json_data:
+        number = str(colored.yellow(issue['number']))
+        width = [[number, 10],]
+        width.append([colored.yellow(issue['user']['login']), 10])
+        width.append(['{0}'.format(issue['title']), 160])
+        puts(columns(*width))
