@@ -19,25 +19,75 @@ from git import Repo
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
 
+def push_to_master():
+    push_master = 'git push -u origin master'
+    args = shlex.split(push_master)
+    commit = subprocess.Popen(args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+    stdout = commit.communicate()
+    print stdout
+
 def create_octogit_readme():
-    pass
+    filename = 'octogit.txt'
+    FILE = open(filename, "w")
+    FILE.write('This repository has been created by Octogit')
+    FILE.close()
 
+def git_add_remote(username, repo_name):
+    git_remote = "git remote add origin git@github.com:%s/%s.git" % (username, repo_name)
+    args = shlex.split(git_remote)
+    commit = subprocess.Popen(args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+    stdout = commit.communicate()
+    print stdout
 
-def create_local_repo(repo_name):
+def git_initial_commit():
+    git_commit = "git commit -am 'this repository now with more tentacles care of octogit'"
+    args = shlex.split(git_commit)
+
+    commit = subprocess.Popen(args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+    stdout = commit.communicate()
+    print stdout
+
+def git_add():
+    git_add  = "git add octogit.txt"
+    args = shlex.split(git_add)
+    commit = subprocess.Popen(args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+    stdout = commit.communicate()
+    print stdout
+
+def create_local_repo(username, repo_name):
+    import pdb; pdb.set_trace()
     # mkdir repo_name
-    repo_locaton = '/'.join([os.getcwd(), repo_name])
-    os.makedirs(repo_location)
+    
+    os.makedirs('/'.join([os.getcwd(), repo_name]))
     # cd repo_name
-    os.chdir(repo_location)
-
-
+    os.chdir('/'.join([os.getcwd(), repo_name]))
+    #git init
+    repository = Repo.init(os.getcwd())
+    # create readme
+    create_octogit_readme()
+    # add readme
+    git_add()
+    #initial commit
+    git_initial_commit()
+    # add remote
+    git_add_remote(username, repo_name)
+    # push to master
+    push_to_master()
 
 def create_repository():
     import pdb; pdb.set_trace()
     post_dict = {'name': 'Hello-World', 'description': 'This is your first repo','homepage': 'https://github.com', 'private': False, 'has_issues': True, 'has_wiki': True,'has_downloads': True}
     r = requests.post('https://api.github.com/user/repos', auth=('myusuf3', ''), data=simplejson.dumps(post_dict))
     if r.status_code == 201:
-        create_local_repo('Hello-World')
+        create_local_repo('myusuf3', 'Hello-World')
     print r.text
 
 def get_repository():
