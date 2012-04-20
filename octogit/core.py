@@ -12,12 +12,15 @@ import subprocess
 
 import requests
 import simplejson
-from clint.textui import colored, puts, indent, columns
 from git import Repo
+from clint.textui import colored, puts, indent, columns
+
+from .config import get_username, get_password
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
+ISSUES_PAGE = 'https://github.com/%s/%s/issues'
 
 def push_to_master():
     push_master = 'git push -u origin master'
@@ -82,13 +85,21 @@ def create_local_repo(username, repo_name):
     # push to master
     push_to_master()
 
-def create_repository():
-    import pdb; pdb.set_trace()
-    post_dict = {'name': 'Hello-World', 'description': 'This is your first repo','homepage': 'https://github.com', 'private': False, 'has_issues': True, 'has_wiki': True,'has_downloads': True}
-    r = requests.post('https://api.github.com/user/repos', auth=('myusuf3', ''), data=simplejson.dumps(post_dict))
+def create_repository(project_name, description):
+    if get_username() == '' or get_password() == '':
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.red('in order to create a repository, you need to login.')))
+
+    post_dict = {'name': project_name, 'description': description ,'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True,'has_downloads': True}
+    username = get_username()
+    password = get_password()
+    r = requests.post('https://api.github.com/user/repos', auth=(username, password), data=simplejson.dumps(post_dict))
     if r.status_code == 201:
-        create_local_repo('myusuf3', 'Hello-World')
-    print r.text
+        create_local_repo(username, project_name)
+    else:
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.red('in order to create a repository, you need to login.')))
+
 
 def get_repository():
     get_top_level_repo = 'git rev-parse --show-toplevel'
@@ -108,7 +119,6 @@ def get_repository():
 
 def get_single_issue(user, repo, number):
     url = SINGLE_ISSUE_ENDPOINT % (user, repo, number)
-    import pdb; pdb.set_trace()
     connect = urllib.urlopen(url)
     json_data = simplejson.load(connect)
     issue_info = '    '.join((
@@ -121,24 +131,27 @@ def get_single_issue(user, repo, number):
 
 def get_issues(user, repo):
     url = ISSUES_ENDPOINT % (user, repo)
-    print url
+    github_issues = ISSUES_PAGE %  (user, repo)
+    puts('link. {0} \n'.format(colored.green(github_issues)))
     connect = urllib.urlopen(url)
     json_data = simplejson.load(connect)
     try:
         json_data['message']
-        puts(colored.cyan('Yay! No issues yet...'))
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.red('Do you even have a Github account? Bad Credentials')))
         return
     except:
         pass
     if len(json_data) == 0 :
-        puts(colored.cyan('Yay! No issues yet...'))
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.cyan('Looks like your perfect welcome to the club.')))
         return
     puts('listing all {0} issues.'.format(colored.red(len(json_data))))
     puts('\n')
 
     for issue in json_data:
         number = str(colored.yellow(issue['number']))
-        width = [[number, 10],]
+        width = [[number, 8],]
         width.append([colored.yellow(issue['user']['login']), 10])
         width.append(['{0}'.format(issue['title']), 160])
         puts(columns(*width))
