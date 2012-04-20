@@ -13,6 +13,7 @@ from clint import args
 from clint.textui import colored, puts, indent
 
 from .core import get_repository, get_issues, get_single_issue, create_repository
+from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
 def get_help():
@@ -21,7 +22,6 @@ def get_help():
     with indent(4):
         puts(colored.green('octogit login'))
         puts(colored.green('octogit create <repo>'))
-        puts(colored.green('octogit delete <repo>'))
         puts(colored.green('octogit issues'))
         puts(colored.green('octogit issues <number>'))
         puts('\n')
@@ -55,7 +55,7 @@ def get_username_and_repo(url):
 
 
 def show_boating():
-    puts('{0} by Mahdi Yusuf <{1}>'.format(colored.blue('octogit'), colored.cyan('@myusuf3')))
+    puts('{0} by Mahdi Yusuf {1}'.format(colored.blue('octogit'), colored.green('@myusuf3')))
     puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
 
 def find_github_remote(repository):
@@ -69,6 +69,14 @@ def find_github_remote(repository):
     sys.exit(0)
 
 def begin():
+    if os.path.exists(CONFIG_FILE):
+        pass
+    else:
+        # create config file 
+        create_config()
+        # commit changes
+        commit_changes()
+
     if args.flags.contains(('--version', '-v')):
         version()
         sys.exit(0)
@@ -85,8 +93,13 @@ def begin():
         sys.exit(0)
 
     elif args.get(0) == 'create':
-        create_repository()
-        sys.exit()
+        if args.get(1) == None or args.get(2) == None:
+            puts('Please provide a proper username password combination')
+        else:
+            project_name = args.get(1)
+            description = args.get(2)
+            create_repository(project_name, description)
+            sys.exit()
 
     elif args.flags.contains(('--issues', '-i')) or args.get(0) == 'issues':
         repo = get_repository()
@@ -103,5 +116,16 @@ def begin():
         get_issues(username, url)
         sys.exit(0)
 
-    elif args.flags.contains(('--location', '-l')) or args.get(0) == 'location' :
-        repo = get_repository()
+    elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :
+        if args.get(1) == None or args.get(2) == None:
+            puts('Please provide a proper username password combination')
+        else:
+            username = args.get(1)
+            password = args.get(2)
+            login(username, password)
+
+    else:
+        get_help()
+        sys.exit(0)
+
+
