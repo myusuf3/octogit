@@ -88,7 +88,14 @@ def git_add():
                 stderr=subprocess.PIPE)
     stdout = commit.communicate()
 
-
+def local_already(repo_name):
+    # mkdir repo_name
+    if os.path.exists('/'.join([os.getcwd(), repo_name])):
+         puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red('the repository already exists locally.')))
+         return True
+    else:
+        return False
 
 def create_local_repo(username, repo_name):
     # mkdir repo_name
@@ -148,6 +155,8 @@ def create_repository(project_name, description, organization=None):
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(-1)
 
+    if local_already(project_name):
+        sys.exit(-1)
     post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
     username = get_username()
     password = get_password()
