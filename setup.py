@@ -38,7 +38,7 @@ dependencies = ['GitPython==0.3.2.RC1',
 
 setup(
     name='octogit',
-    version='0.1.2',
+    version='0.1.3',
     description='giving git tentacles to work better with github',
     url='https://github.com/myusuf3/octogit',
     author='Mahdi Yusuf',
@@ -53,7 +53,7 @@ Octogit
 
 Do you hate this screen? Do you hate switching screens to see issues? Do you love the terminal? Then you will love this project.
 
-During the development of this plugin Github smartened up and introduced a new way to create repositories. Hopefully people who like to stay in the terminal will enjoy this litle cli app. 
+During the development of this plugin Github smartened up and introduced a new way to create repositories. Hopefully people who like to stay in the terminal will enjoy this litle cli app.
 
 .. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
 
