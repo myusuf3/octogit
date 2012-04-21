@@ -142,7 +142,7 @@ def close_issue(user, repo, number):
         sys.exit(-1)
 
 
-def create_repository(project_name, description):
+def create_repository(project_name, description, organization=None):
     if get_username() == '' or get_password() == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
@@ -151,16 +151,27 @@ def create_repository(project_name, description):
     post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
     username = get_username()
     password = get_password()
-    re = requests.post('https://api.github.com/user/repos', auth=(username, password), data=simplejson.dumps(post_dict))
-    if re.status_code == 201:
-        create_local_repo(username, project_name)
-    elif simplejson.loads(re.content)['errors'][0]['message'] == 'name already exists on this account':
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('repository named this already exists on github')))
+    if organization:
+        post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('in order to create a repository, you need to login.')))
-        sys.exit(-1)
+        post_url = 'https://api.github.com/user/repos'
+    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
+    if re.status_code == 201:
+        if organization:
+            create_local_repo(organization, project_name)
+        else:
+            create_local_repo(username, project_name)
+    else:
+        # Something went wrong
+        post_response = simplejson.loads(re.content)
+        errors = post_response.get('errors')
+        if errors and errors[0]['message'] == 'name already exists on this account':
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('repository named this already exists on github')))
+        else:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('something went wrong. perhaps you need to login?')))
+            sys.exit(-1)
 
 
 def get_repository():
