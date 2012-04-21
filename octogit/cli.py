@@ -29,7 +29,7 @@ def get_help():
         puts('\n')
 
 def show_boating():
-    puts('{0}. version 0.1.1 by Mahdi Yusuf {1}'.format(colored.blue('octogit'), colored.green('@myusuf3')))
+    puts('{0}. version 0.1.2 by Mahdi Yusuf {1}'.format(colored.blue('octogit'), colored.green('@myusuf3')))
     puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
 
 def version():
