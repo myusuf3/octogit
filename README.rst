@@ -2,7 +2,6 @@
 Octogit
 ========
 
-
 Do you hate this screen? Do you hate switching screens to see issues? Do you love the terminal? Then you will love this project.
 
 
@@ -12,4 +11,10 @@ Do you hate this screen? Do you hate switching screens to see issues? Do you lov
 Installation
 ============
 
-This is a work in progress, I will finish it up soon. Keep an eye out. 
+`pip install octogit`
+
+
+How to Octogit
+==============
+
+Go to http://myusuf3.github.com/octogit
