@@ -157,7 +157,10 @@ def create_repository(project_name, description, organization=None):
         post_url = 'https://api.github.com/user/repos'
     re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
     if re.status_code == 201:
-        create_local_repo(username, project_name)
+        if organization:
+            create_local_repo(organization, project_name)
+        else:
+            create_local_repo(username, project_name)
     else:
         # Something went wrong
         post_response = simplejson.loads(re.content)
