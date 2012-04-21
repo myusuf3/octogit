@@ -6,6 +6,13 @@ except ImportError:
     from distutils.core import setup
 
 
+def publish():
+    os.system("python setup.py sdist upload")
+
+if sys.argv[-1] == "publish":
+    publish()
+    sys.exit()
+
 dependencies = ['clint>=0.2.1', 'requests']
 
 setup(
