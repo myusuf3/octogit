@@ -46,8 +46,11 @@ def get_username_and_repo(url):
         return m.groups()
     else:
         # matching origin of this type
-        # git@github.com:myusuf3/delorean.git
+        # git@github.com:[/]myusuf3/delorean.git
         username_repo = url.split(':')[1].replace('.git', '').split('/')
+        # Handle potential leading slash after :
+        if username_repo[0] == '':
+            username_repo = username_repo[1:]
         if len(username_repo) == 2:
             return username_repo
         else:
