@@ -23,6 +23,7 @@ def get_help():
     with indent(4):
         puts(colored.green('octogit login'))
         puts(colored.green("octogit create <repo> 'description'"))
+        puts(colored.green("octogit create <repo> 'description' <organization>"))
         puts(colored.green('octogit issues'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
@@ -99,7 +100,8 @@ def begin():
         else:
             project_name = args.get(1)
             description = args.get(2)
-            create_repository(project_name, description)
+            organization = args.get(3)
+            create_repository(project_name, description, organization=organization)
             sys.exit()
 
     elif args.flags.contains(('--issues', '-i')) or args.get(0) == 'issues':
