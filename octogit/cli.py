@@ -12,7 +12,8 @@ from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
-from .core import get_repository, get_issues, get_single_issue, create_repository
+from .core import (get_repository, get_issues,
+        get_single_issue, create_repository, close_issue)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
@@ -35,7 +36,7 @@ def git_status():
     print git.status()
 
 def get_username_and_repo(url):
-    # matching origin of this type 
+    # matching origin of this type
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
     if m:
@@ -65,14 +66,14 @@ def find_github_remote(repository):
             return remote.url
         else:
             pass
-    puts(colored.red('This repository has no Github remotes')) 
+    puts(colored.red('This repository has no Github remotes'))
     sys.exit(0)
 
 def begin():
     if os.path.exists(CONFIG_FILE):
         pass
     else:
-        # create config file 
+        # create config file
         create_config()
         # commit changes
         commit_changes()
@@ -94,7 +95,9 @@ def begin():
 
     elif args.get(0) == 'create':
         if args.get(1) == None or args.get(2) == None:
-            puts('Please provide a proper username password combination')
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('You need to pass both a project name and description')))
+
         else:
             project_name = args.get(1)
             description = args.get(2)
@@ -111,19 +114,23 @@ def begin():
         except:
             pass
         if issue_number is not None:
-            get_single_issue(username, url, issue_number)
-            sys.exit(0)
+            if args.get(2) == 'close':
+                close_issue(username, url, issue_number)
+                sys.exit(0)
+            else:
+                get_single_issue(username, url, issue_number)
+                sys.exit(0)
         get_issues(username, url)
         sys.exit(0)
 
     elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :
         if args.get(1) == None or args.get(2) == None:
-            puts('Please provide a proper username password combination')
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('You need both a password and username to login')))
         else:
             username = args.get(1)
             password = args.get(2)
             login(username, password)
-
     else:
         get_help()
         sys.exit(0)
