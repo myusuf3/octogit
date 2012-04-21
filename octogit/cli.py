@@ -22,14 +22,15 @@ def get_help():
     puts('\n{0}:'.format(colored.cyan('tentacles')))
     with indent(4):
         puts(colored.green('octogit login'))
-        puts(colored.green('octogit create <repo>'))
+        puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green('octogit issues'))
         puts(colored.green('octogit issues <number>'))
+        puts(colored.green('octogit issues <number> close'))
         puts('\n')
 
 
 def version():
-    puts('development 0.1.0')
+    puts('release 0.1.0')
 
 
 def git_status():
