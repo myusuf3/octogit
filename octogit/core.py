@@ -158,13 +158,17 @@ def create_repository(project_name, description, organization=None):
     re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
     if re.status_code == 201:
         create_local_repo(username, project_name)
-    elif simplejson.loads(re.content)['errors'][0]['message'] == 'name already exists on this account':
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('repository named this already exists on github')))
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('in order to create a repository, you need to login.')))
-        sys.exit(-1)
+        # Something went wrong
+        post_response = simplejson.loads(re.content)
+        errors = post_response.get('errors')
+        if errors and errors[0]['message'] == 'name already exists on this account':
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('repository named this already exists on github')))
+        else:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('something went wrong. perhaps you need to login?')))
+            sys.exit(-1)
 
 
 def get_repository():
