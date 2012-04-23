@@ -24,7 +24,7 @@ def get_help():
         puts(colored.green('octogit login'))
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
-        puts(colored.green('octogit issues'))
+        puts(colored.green('octogit issues [--assigned]'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
         puts('\n')
