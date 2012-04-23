@@ -254,8 +254,7 @@ def get_issues(user, repo):
         #skip pull requests
         if issue['pull_request']['html_url'] != None:
             continue
-        print issue['title']
         width = [[colored.yellow('#'+str(issue['number'])), 5],]
-        width.append(['{0}'.format(issue['title']), 70])
+        width.append(['{0}'.format(issue['title'].encode('utf-8')), 70])
         width.append([colored.red('('+ issue['user']['login']+')'), None])
         puts(columns(*width))
