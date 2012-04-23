@@ -235,7 +235,9 @@ def get_issues(user, repo, assigned=None):
         connect = requests.get(url, auth=(get_username(), get_password()))
     else:
         if assigned:
-            raise Exception('Cannot find assigned issues if no username exists.')
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.red('Please log in to see issues assigned to you.')))
+            sys.exit(0)
         connect = requests.get(url)
 
     json_data = simplejson.loads(connect.content)
