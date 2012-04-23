@@ -239,7 +239,7 @@ def get_issues(user, repo):
     try:
         json_data['message']
         puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('Do you even have a Github account? Bad Credentials')))
+            colored.red('Error retrieving issues: ' + json_data['message'])))
         return
     except:
         pass
@@ -254,6 +254,7 @@ def get_issues(user, repo):
         #skip pull requests
         if issue['pull_request']['html_url'] != None:
             continue
+        print issue['title']
         width = [[colored.yellow('#'+str(issue['number'])), 5],]
         width.append(['{0}'.format(issue['title']), 70])
         width.append([colored.red('('+ issue['user']['login']+')'), None])
