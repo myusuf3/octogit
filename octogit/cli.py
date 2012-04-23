@@ -121,7 +121,7 @@ def begin():
             else:
                 get_single_issue(username, url, issue_number)
                 sys.exit(0)
-        get_issues(username, url)
+        get_issues(username, url, args.flags.contains(('--assigned', '-a')))
         sys.exit(0)
 
     elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :

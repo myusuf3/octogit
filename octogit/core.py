@@ -205,13 +205,17 @@ def get_single_issue(user, repo, number):
     puts(description)
 
 
-def get_issues(user, repo):
+def get_issues(user, repo, assigned=None):
     url = ISSUES_ENDPOINT % (user, repo)
     github_issues_url = ISSUES_PAGE %  (user, repo)
 
     if valid_credentials():
+        if assigned:
+            url += '?assignee=%s' % get_username()
         connect = requests.get(url, auth=(get_username(), get_password()))
     else:
+        if assigned:
+            raise Exception('Cannot find assigned issues if no username exists.')
         connect = requests.get(url)
 
     json_data = simplejson.loads(connect.content)
