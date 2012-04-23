@@ -239,7 +239,7 @@ def get_issues(user, repo):
     try:
         json_data['message']
         puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('Error retrieving issues: ' + json_data['message'])))
+            colored.red('Error retrieving issues: ' + json_data['message'] + ' ('+ repo +')')))
         return
     except:
         pass
