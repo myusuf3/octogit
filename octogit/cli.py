@@ -18,8 +18,18 @@ from .core import (get_repository, get_issues,
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
+def version():
+    from . import __version__
+    return ".".join(str(x) for x in __version__)
+
+
 def get_help():
-    puts('{0}.'.format(colored.blue('octogit')))
+    puts('{0}. version {1} by Mahdi Yusuf {2}'.format(
+            colored.blue('octogit'),
+            version(),
+            colored.green('@myusuf3')))
+    puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
+
     puts('\n{0}:'.format(colored.cyan('tentacles')))
     with indent(4):
         puts(colored.green('octogit login'))
@@ -32,12 +42,6 @@ def get_help():
         puts(colored.green('octogit status'))
         puts('\n')
 
-def show_boating():
-    puts('{0}. version 0.1.3 by Mahdi Yusuf {1}'.format(colored.blue('octogit'), colored.green('@myusuf3')))
-    puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
-
-def version():
-    show_boating()
 
 def git_status():
     print git.status()
@@ -84,11 +88,11 @@ def begin():
         commit_changes()
 
     if args.flags.contains(('--version', '-v')):
-        version()
+        puts(version())
         sys.exit(0)
 
     elif args.get(0) == None:
-        show_boating()
+        get_help()
 
     elif args.get(0) == 'status':
         git_status()
