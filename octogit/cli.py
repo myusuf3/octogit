@@ -27,6 +27,7 @@ def get_help():
         puts(colored.green('octogit issues'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
+        puts(colored.green('octogit status'))
         puts('\n')
 
 def show_boating():
