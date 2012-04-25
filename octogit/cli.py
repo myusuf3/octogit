@@ -13,7 +13,8 @@ from clint import args
 from clint.textui import colored, puts, indent
 
 from .core import (get_repository, get_issues,
-        get_single_issue, create_repository, close_issue)
+        get_single_issue, create_repository, close_issue,
+        view_issue)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
@@ -27,6 +28,7 @@ def get_help():
         puts(colored.green('octogit issues'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
+        puts(colored.green('octogit issues <number> view'))
         puts(colored.green('octogit status'))
         puts('\n')
 
@@ -121,6 +123,8 @@ def begin():
             if args.get(2) == 'close':
                 close_issue(username, url, issue_number)
                 sys.exit(0)
+            elif args.get(2) == 'view':
+                view_issue(username, url, issue_number)
             else:
                 get_single_issue(username, url, issue_number)
                 sys.exit(0)

@@ -8,6 +8,8 @@ import os
 import sys
 import shlex
 import subprocess
+import webbrowser
+
 
 import requests
 import simplejson
@@ -147,6 +149,14 @@ def close_issue(user, repo, number):
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red("You either aren't allowed to close repository or you need to login in dummy.")))
         sys.exit(-1)
+
+
+def view_issue(user, repo, number):
+    """Displays the specified issue in a browser
+    """
+
+    github_view_url = SINGLE_ISSUE_PAGE % (user, repo, number)
+    webbrowser.open(github_view_url)
 
 
 def create_repository(project_name, description, organization=None):
