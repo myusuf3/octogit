@@ -228,11 +228,13 @@ def get_single_issue(user, repo, number):
     puts(columns(*width))
     description = description_clean(issue['body'])
     puts(description)
-    puts('Comments:');
-    for comment in comments:
-        width = [[colored.yellow(comment['body']), 75],]
-        width.append([colored.red('('+ comment['user']['login']+')'), None])
-        puts(columns(*width)+'\n')
+    # Print out comments if there are any
+    if len(comments) > 0:
+        puts('Comments:')
+        for comment in comments:
+            width = [[colored.yellow(comment['body']), 75],]
+            width.append([colored.red('('+ comment['user']['login']+')'), None])
+            puts(columns(*width)+'\n')
 
 
 def get_issues(user, repo):
