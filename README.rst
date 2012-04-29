@@ -15,10 +15,27 @@ Installing using pip. ::
     pip install octogit
 
 
-How to Octogit
+Using Octogit
 ==============
 
-Go to http://myusuf3.github.com/octogit
+Available commands. ::
+
+octogit login <username> <password> 
+# allows you to store your github authentication data 
+
+octogit create <reponame> 'description' 
+# lets you create the repository both locally and on github 
+
+octogit issues 
+# lets you see all the related issues in the current repository 
+
+octogit issues <number> 
+# lets you see a specific issue with summary 
+
+octogit issues <number> close 
+# lets you close an issue
+
+
 
 
 Contribute
