@@ -2,6 +2,8 @@
 Octogit
 ========
 
+.. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
+
 A **free** and **open source** interface to github from the command line. Avoid the usual copy and paste when creating repositories, keep up to date on issues, and much more.
 
 --Everybody loves more tentacles.
