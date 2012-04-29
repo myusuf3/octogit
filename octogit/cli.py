@@ -35,7 +35,7 @@ def get_help():
         puts(colored.green('octogit login'))
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
-        puts(colored.green('octogit issues'))
+        puts(colored.green('octogit issues [--assigned]'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
         puts(colored.green('octogit issues <number> view'))
@@ -132,7 +132,7 @@ def begin():
             else:
                 get_single_issue(username, url, issue_number)
                 sys.exit(0)
-        get_issues(username, url)
+        get_issues(username, url, args.flags.contains(('--assigned', '-a')))
         sys.exit(0)
 
     elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :
