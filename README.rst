@@ -11,7 +11,7 @@ During the development of this plugin Github smartened up and introduced a new w
 
 Installation
 ============
- ::
+::
     pip install octogit
 
 
