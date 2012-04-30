@@ -13,7 +13,7 @@ from clint import args
 from clint.textui import colored, puts, indent
 
 from .core import (get_repository, get_issues,
-        get_single_issue, create_repository, close_issue)
+        get_single_issue, create_repository, close_issue, create_issue)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
@@ -25,6 +25,7 @@ def get_help():
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
         puts(colored.green('octogit issues'))
+        puts(colored.green('octogit issues create'))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
         puts('\n')
@@ -111,6 +112,18 @@ def begin():
         repo = get_repository()
         url = find_github_remote(repo)
         username, url = get_username_and_repo(url)
+        if args.get(1) == 'create':
+            if args.get(2) == None:
+                puts('{0}. {1}'.format(colored.blue('octogit'),
+                    colored.red('You need to pass an issue name')))
+
+            else:
+                issue_name = args.get(2)
+                description = args.get(3)
+                create_issue(username, url, issue_name, description)
+
+            sys.exit(0)
+
         issue_number = None
         try:
             issue_number = int(args.get(1))
