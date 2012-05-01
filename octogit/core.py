@@ -268,3 +268,22 @@ def get_issues(user, repo):
         width.append(['{0}'.format(issue['title']), 70])
         width.append([colored.red('('+ issue['user']['login']+')'), None])
         puts(columns(*width))
+
+def create_issue(user, repo, issue_name, description):
+    username = get_username()
+    password = get_password()
+    if username == '' or password == '':
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red('in order to create an issue, you need to login.')))
+        sys.exit(-1)
+
+    post_url = ISSUES_ENDPOINT % (user, repo)
+    post_dict = {'title': issue_name, 'body': description}
+    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
+    if re.status_code == 201:
+        puts('{0}'.format(colored.blue('issue created')))
+    else:
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.red('something went wrong. perhaps you need to login?')))
+        sys.exit(-1)
+        
