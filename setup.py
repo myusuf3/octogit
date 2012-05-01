@@ -9,6 +9,9 @@ except ImportError:
     from distutils.core import setup
 
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from octogit import __version__
+
 def publish():
     os.system("python setup.py sdist upload")
 
@@ -38,7 +41,7 @@ dependencies = ['GitPython==0.3.2.RC1',
 
 setup(
     name='octogit',
-    version='0.1.3',
+    version=".".join(str(x) for x in __version__),
     description='giving git tentacles to work better with github',
     url='https://github.com/myusuf3/octogit',
     author='Mahdi Yusuf',

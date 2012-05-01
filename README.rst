@@ -2,23 +2,41 @@
 Octogit
 ========
 
-Do you hate this screen? Do you hate switching screens to see issues? Do you love the terminal? Then you will love this project.
-
-During the development of this plugin Github smartened up and introduced a new way to create repositories. Hopefully people who like to stay in the terminal will enjoy this little cli app. 
-
 .. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
+   :align: center
+
+A **free** and **open source** interface to github from the command line. Avoid the usual copy and paste when creating repositories, keep up to date on issues, and much more.
+
+--Everybody loves more tentacles.
 
 
 Installation
 ============
 
- `pip install octogit`
+Installing using pip. ::
+
+    pip install octogit
 
 
-How to Octogit
+Using Octogit
 ==============
 
-Go to http://myusuf3.github.com/octogit
+Available commands. ::
+
+    octogit login <username> <password> 
+    # allows you to store your github authentication data 
+
+    octogit create <reponame> 'description' 
+    # lets you create the repository both locally and on github 
+
+    octogit issues 
+    # lets you see all the related issues in the current repository 
+
+    octogit issues <number> 
+    # lets you see a specific issue with summary 
+
+    octogit issues <number> close 
+    # lets you close an issue
 
 
 Contribute
