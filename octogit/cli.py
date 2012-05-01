@@ -36,7 +36,7 @@ def get_help():
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
         puts(colored.green('octogit issues'))
-        puts(colored.green("octogit issues create 'issue name' 'description'"))
+        puts(colored.green("octogit issues create 'issue title' 'description'"))
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
         puts(colored.green('octogit issues <number> view'))
@@ -122,14 +122,14 @@ def begin():
         if args.get(1) == 'create':
             if args.get(2) == None:
                 puts('{0}. {1}'.format(colored.blue('octogit'),
-                    colored.red('You need to pass an issue name')))
+                    colored.red('You need to pass an issue title')))
+                sys.exit(-1)
 
             else:
                 issue_name = args.get(2)
                 description = args.get(3)
                 create_issue(username, url, issue_name, description)
-
-            sys.exit(0)
+                sys.exit(0)
 
         issue_number = None
         try:
