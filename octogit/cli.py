@@ -8,9 +8,9 @@ import os
 import re
 import sys
 
-from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
+from git import Repo
 
 from .core import (get_repository, get_issues,
         get_single_issue, create_repository, close_issue,
@@ -45,7 +45,7 @@ def get_help():
 
 
 def git_status():
-    print git.status()
+    print Repo('.').git.status()
 
 def get_username_and_repo(url):
     # matching origin of this type
