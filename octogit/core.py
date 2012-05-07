@@ -9,7 +9,7 @@ import os
 import sys
 import shlex
 import subprocess
-import unicodedata
+import webbrowser
 import requests
 import simplejson
 from git import Repo
@@ -18,7 +18,7 @@ from clint.textui import colored, puts, columns
 from .config import get_username, get_password
 
 
-ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
+ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
 ISSUES_PAGE = 'https://github.com/%s/%s/issues'
 SINGLE_ISSUE_PAGE = 'https://github.com/%s/%s/issues/%s'
@@ -146,8 +146,16 @@ def close_issue(user, repo, number):
         puts('{0}.'.format(colored.red('closed')))
     else:
         puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red("You either aren't allowed to close repository or you need to login in dummy.")))
+            colored.red("You either aren't allowed to close repository or you need to login in silly.")))
         sys.exit(-1)
+
+
+def view_issue(user, repo, number):
+    """Displays the specified issue in a browser
+    """
+
+    github_view_url = SINGLE_ISSUE_PAGE % (user, repo, number)
+    webbrowser.open(github_view_url)
 
 
 def create_repository(project_name, description, organization=None):
@@ -226,22 +234,25 @@ def get_single_issue(user, repo, number):
     puts(description)
 
 def get_issues(user, repo, assigned=None):
-    url = ISSUES_ENDPOINT % (user, repo)
-    print url
+    import pdb; pdb.set_trace()
+    count = 0
     github_issues_url = ISSUES_PAGE %  (user, repo)
+    json_data = []
+    while True:
+        count += 1
+        url = ISSUES_ENDPOINT % (user, repo, count)
+        if valid_credentials():
+            if assigned:
+                url += '&assignee=%s' % get_username()
+            connect = requests.get(url, auth=(get_username(), get_password()))
+        else:
+            if assigned:
+                puts('{0}. {1}'.format(colored.blue('octogit'),
+                    colored.red('Please log in to see issues assigned to you.')))
+                sys.exit(0)
+            connect = requests.get(url)
 
-    if valid_credentials():
-        if assigned:
-            url += '?assignee=%s' % get_username()
-        connect = requests.get(url, auth=(get_username(), get_password()))
-    else:
-        if assigned:
-            puts('{0}. {1}'.format(colored.blue('octogit'),
-                colored.red('Please log in to see issues assigned to you.')))
-            sys.exit(0)
-        connect = requests.get(url)
-
-    json_data = simplejson.loads(connect.content)
+        json_data = simplejson.loads(connect.content)
 
     try:
         json_data['message']
@@ -267,3 +278,23 @@ def get_issues(user, repo, assigned=None):
         width.append([issue['title'], 95])
         width.append([colored.red('('+ issue['user']['login']+')'), None])
         print columns(*width)
+
+
+def create_issue(user, repo, issue_name, description):
+    username = get_username()
+    password = get_password()
+    if username == '' or password == '':
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red('in order to create an issue, you need to login.')))
+        sys.exit(-1)
+
+    post_url = ISSUES_ENDPOINT % (user, repo)
+    post_dict = {'title': issue_name, 'body': description}
+    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
+    if re.status_code == 201:
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red('New issue created!')))
+    else:
+        puts('{0}. {1}'.format(colored.blue('octogit'), 
+            colored.red('something went wrong. perhaps you need to login?')))
+        sys.exit(-1)
