@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 octogit
 
@@ -8,7 +9,7 @@ import os
 import sys
 import shlex
 import subprocess
-
+import unicodedata
 import requests
 import simplejson
 from git import Repo
@@ -129,7 +130,7 @@ def get_number_issues(content):
             pass
         else:
             count +=1
-    return count
+    return str(count)
 
 def close_issue(user, repo, number):
     if get_username() == '' or get_password() == '':
@@ -224,9 +225,9 @@ def get_single_issue(user, repo, number):
     description = description_clean(issue['body'])
     puts(description)
 
-
 def get_issues(user, repo, assigned=None):
     url = ISSUES_ENDPOINT % (user, repo)
+    print url
     github_issues_url = ISSUES_PAGE %  (user, repo)
 
     if valid_credentials():
@@ -261,6 +262,8 @@ def get_issues(user, repo, assigned=None):
         if issue['pull_request']['html_url'] != None:
             continue
         width = [[colored.yellow('#'+str(issue['number'])), 5],]
-        width.append(['{0}'.format(issue['title']), 70])
+        if isinstance(issue['title'], unicode):
+            issue['title'] = issue['title'].encode('utf-8')
+        width.append([issue['title'], 95])
         width.append([colored.red('('+ issue['user']['login']+')'), None])
-        puts(columns(*width))
+        print columns(*width)
