@@ -252,7 +252,7 @@ def get_issues(user, repo, assigned=None):
                 sys.exit(0)
             connect = requests.get(url)
 
-        json_data = simplejson.loads(connect.content)
+        json_data += simplejson.loads(connect.content)
 
     try:
         json_data['message']
