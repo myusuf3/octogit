@@ -21,13 +21,6 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 dependencies = ['GitPython==0.3.2.RC1',
-                'argparse==1.2.1',
-                'async==0.6.1',
-                'certifi==0.0.8',
-                'chardet==1.0.1',
-                'gitdb==0.5.4',
-                'github2==0.6.0',
-                'httplib2==0.7.2',
                 'pbs==0.98',
                 'requests==0.10.1',
                 'simplejson==2.3.2',
