@@ -20,6 +20,7 @@ from .config import get_username, get_password
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
+SINGLE_ISSUE_COMMENTS_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s/comments'
 ISSUES_PAGE = 'https://github.com/%s/%s/issues'
 SINGLE_ISSUE_PAGE = 'https://github.com/%s/%s/issues/%s'
 
@@ -219,19 +220,30 @@ def description_clean(string):
 
 def get_single_issue(user, repo, number):
     url = SINGLE_ISSUE_ENDPOINT % (user, repo, number)
+    comments_url = SINGLE_ISSUE_COMMENTS_ENDPOINT % (user, repo, number)
     github_single_url = SINGLE_ISSUE_PAGE % (user, repo, number)
     puts('link. {0} \n'.format(colored.green(github_single_url)))
     if valid_credentials():
-        connect = requests.get(url, auth=(get_username(), get_password()))
+        connect_issue = requests.get(url, auth=(get_username(), get_password()))
+        connect_comments = requests.get(comments_url, auth=(get_username(), get_password()))
     else:
-        connect = requests.get(url)
+        connect_issue = requests.get(url)
+        connect_comments = requests.get(comments_url)
 
-    issue = simplejson.loads(connect.content)
+    issue = simplejson.loads(connect_issue.content)
+    comments = simplejson.loads(connect_comments.content);
     width = [[colored.yellow('#'+str(issue['number'])), 5],]
     width.append([colored.red('('+ issue['user']['login']+')'), 15])
     puts(columns(*width))
     description = description_clean(issue['body'])
     puts(description)
+    # Print out comments if there are any
+    if len(comments) > 0:
+        puts('Comments:')
+        for comment in comments:
+            width = [[colored.yellow(comment['body']), 75],]
+            width.append([colored.red('('+ comment['user']['login']+')'), None])
+            puts(columns(*width)+'\n')
 
 def get_issues(user, repo, assigned=None):
     import pdb; pdb.set_trace()
