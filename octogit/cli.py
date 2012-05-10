@@ -8,7 +8,6 @@ import os
 import re
 import sys
 
-from pbs import git
 from clint import args
 from clint.textui import colored, puts, indent
 
@@ -42,10 +41,6 @@ def get_help():
         puts(colored.green('octogit issues <number> close'))
         puts(colored.green('octogit issues <number> view'))
         puts('\n')
-
-
-def git_status():
-    print git.status()
 
 def get_username_and_repo(url):
     # matching origin of this type
@@ -94,10 +89,6 @@ def begin():
 
     elif args.get(0) == None:
         get_help()
-
-    elif args.get(0) == 'status':
-        git_status()
-        sys.exit(0)
 
     elif args.flags.contains(('--help', '-h')) or args.get(0) == 'help':
         get_help()

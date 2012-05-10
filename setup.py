@@ -20,11 +20,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['GitPython==0.3.2.RC1',
-                'pbs==0.98',
-                'requests==0.10.1',
-                'simplejson==2.3.2',
-]
+dependencies = ['requests==0.10.1', ]
 
 setup(
     name='octogit',
@@ -67,10 +63,5 @@ If you would like to contribute simply fork this project and add yourself to the
 
 
 
-    """,
-    entry_points={
-        'console_scripts': [
-            'octogit = octogit.cli:begin',
-        ],
-    },
+    """
     )
