@@ -1,5 +1,39 @@
 #!/usr/bin/env python
 
+"""
+========
+Octogit
+========
+
+Do you hate this screen? Do you hate switching screens to see issues? Do you love the
+terminal? Then you will love this project.
+
+During the development of this plugin Github smartened up and introduced a new way to
+create repositories. Hopefully people who like to stay in the terminal will enjoy this
+litle cli app.
+
+.. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
+
+
+Installation
+============
+
+`pip install octogit`
+
+
+How to Octogit
+==============
+
+Go to http://myusuf3.github.com/octogit
+
+
+Contribute
+==========
+If you would like to contribute simply fork this project and add yourself to the
+AUTHORS.txt along with some changes hopefully and submit a pull request.
+
+"""
+
 import os
 import sys
 
@@ -20,7 +54,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['requests==0.10.1', ]
+dependencies = ['requests', 'clint', 'dulwich']
 
 setup(
     name='octogit',
@@ -33,35 +67,5 @@ setup(
     tests_require=['tox==1.3'],
     packages=['octogit', ],
     license='MIT License',
-    long_description="""
-========
-Octogit
-========
-
-Do you hate this screen? Do you hate switching screens to see issues? Do you love the terminal? Then you will love this project.
-
-During the development of this plugin Github smartened up and introduced a new way to create repositories. Hopefully people who like to stay in the terminal will enjoy this litle cli app.
-
-.. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
-
-
-Installation
-============
-
-`pip install octogit`
-
-
-How to Octogit
-==============
-
-Go to http://myusuf3.github.com/octogit
-
-
-Contribute
-==========
-If you would like to contribute simply fork this project and add yourself to the AUTHORS.txt along with some changes hopefully and submit a pull request.
-
-
-
-    """
+    long_description=__doc__
     )

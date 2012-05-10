@@ -8,6 +8,8 @@ import os
 import re
 import sys
 
+from ConfigParser import ConfigParser
+
 from clint import args
 from clint.textui import colored, puts, indent
 
@@ -65,14 +67,13 @@ def get_username_and_repo(url):
             return username_repo
 
 def find_github_remote(repository):
-    remotes = repository.remotes
-    for remote in remotes:
-        if 'github' in remote.url:
-            return remote.url
-        else:
-            pass
-    puts(colored.red('This repository has no Github remotes'))
-    sys.exit(0)
+    conf = repository.get_config().__dict__.get('_values', {})
+    for key, values in conf.items():
+        if 'remote' in key and 'github' in values['url']:
+            return values['url']
+    else:
+        puts(colored.red('This repository has no Github remotes'))
+        sys.exit(0)
 
 def begin():
     if os.path.exists(CONFIG_FILE):

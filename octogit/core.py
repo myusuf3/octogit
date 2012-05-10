@@ -6,16 +6,22 @@ This file contains stuff for github api
 """
 
 import os
+import io
 import sys
 import shlex
 import subprocess
 import webbrowser
 import requests
-import simplejson
-from git import Repo
+import json
+from dulwich.repo import Repo
 from clint.textui import colored, puts, columns
 
 from .config import get_username, get_password
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
@@ -44,9 +50,8 @@ def push_to_master():
 
 
 def create_octogit_readme():
-    filename = 'README.rst'
-    FILE = open(filename, "w")
-    FILE.write("""========
+    with io.open('README.rst', 'w') as fp:
+        fp.write(u"""========
 Octogit
 ========
 
@@ -60,7 +65,6 @@ Author
 ======
 Mahdi Yusuf (@myusuf3)
 """)
-    FILE.close()
 
 
 def git_add_remote(username, repo_name):
@@ -141,7 +145,7 @@ def close_issue(user, repo, number):
     post_dict = {'state': 'close'}
     username = get_username()
     password = get_password()
-    r = requests.post(update_issue, auth=(username, password), data=simplejson.dumps(post_dict))
+    r = requests.post(update_issue, auth=(username, password), data=json.dumps(post_dict))
     if r.status_code == 200:
         puts('{0}.'.format(colored.red('closed')))
     else:
@@ -162,10 +166,10 @@ def create_repository(project_name, description, organization=None):
     if get_username() == '' or get_password() == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
-        sys.exit(-1)
+        sys.exit(1)
 
     if local_already(project_name):
-        sys.exit(-1)
+        sys.exit(1)
     post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
     username = get_username()
     password = get_password()
@@ -173,7 +177,7 @@ def create_repository(project_name, description, organization=None):
         post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
         post_url = 'https://api.github.com/user/repos'
-    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
+    re = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
     if re.status_code == 201:
         if organization:
             create_local_repo(organization, project_name)
@@ -181,7 +185,7 @@ def create_repository(project_name, description, organization=None):
             create_local_repo(username, project_name)
     else:
         # Something went wrong
-        post_response = simplejson.loads(re.content)
+        post_response = json.loads(re.content)
         errors = post_response.get('errors')
         if errors and errors[0]['message'] == 'name already exists on this account':
             puts('{0}. {1}'.format(colored.blue('octogit'),
@@ -226,7 +230,7 @@ def get_single_issue(user, repo, number):
     else:
         connect = requests.get(url)
 
-    issue = simplejson.loads(connect.content)
+    issue = json.loads(connect.content)
     width = [[colored.yellow('#'+str(issue['number'])), 5],]
     width.append([colored.red('('+ issue['user']['login']+')'), 15])
     puts(columns(*width))
@@ -290,11 +294,11 @@ def create_issue(user, repo, issue_name, description):
 
     post_url = ISSUES_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
-    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
+    re = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
     if re.status_code == 201:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'), 
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('something went wrong. perhaps you need to login?')))
         sys.exit(-1)
