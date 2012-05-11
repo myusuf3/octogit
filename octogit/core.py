@@ -13,8 +13,6 @@ import shlex
 import subprocess
 import webbrowser
 import requests
-import json
-from dulwich.repo import Repo
 from clint.textui import colored, puts, columns
 
 from .config import get_username, get_password
@@ -22,7 +20,7 @@ from .config import get_username, get_password
 try:
     import json
 except ImportError:
-    import simplejson as json
+    import simplejson as json  # NOQA
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
@@ -47,7 +45,7 @@ def push_to_master():
     commit = subprocess.Popen(args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit.communicate()
 
 
 def create_octogit_readme():
@@ -56,9 +54,7 @@ def create_octogit_readme():
 Octogit
 ========
 
-
 This repository has been created with Octogit.
-
 
 .. image:: http://myusuf3.github.com/octogit/assets/img/readme_image.png
 
@@ -68,12 +64,16 @@ Mahdi Yusuf (@myusuf3)
 """)
 
 
+def git_init(repo_name):
+    git_init = "git init %s" % repo_name
+    args = shlex.split(git_init)
+    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+
+
 def git_add_remote(username, repo_name):
     git_remote = "git remote add origin git@github.com:%s/%s.git" % (username, repo_name)
     args = shlex.split(git_remote)
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
 
 def git_initial_commit():
@@ -83,16 +83,15 @@ def git_initial_commit():
     commit = subprocess.Popen(args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit.communicate()
 
 
 def git_add():
     git_add  = "git add README.rst"
     args = shlex.split(git_add)
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    commit.communicate()
+
 
 def local_already(repo_name):
     # mkdir repo_name
@@ -102,6 +101,7 @@ def local_already(repo_name):
          return True
     else:
         return False
+
 
 def create_local_repo(username, repo_name):
     # mkdir repo_name
@@ -113,7 +113,7 @@ def create_local_repo(username, repo_name):
         # cd repo_name
         os.chdir('/'.join([os.getcwd(), repo_name]))
         #git init
-        repository = Repo.init(os.getcwd())
+        git_init(os.getcwd())
         # create readme
         create_octogit_readme()
         # add readme
@@ -127,15 +127,6 @@ def create_local_repo(username, repo_name):
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.green('this is your moment of glory; Be a hero.')))
 
-
-def get_number_issues(content):
-    count = 0
-    for issue in content:
-        if issue['pull_request']['html_url'] != None:
-            pass
-        else:
-            count +=1
-    return str(count)
 
 def close_issue(user, repo, number):
     if get_username() == '' or get_password() == '':
@@ -178,15 +169,15 @@ def create_repository(project_name, description, organization=None):
         post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
         post_url = 'https://api.github.com/user/repos'
-    re = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
-    if re.status_code == 201:
+    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    if r.status_code == 201:
         if organization:
             create_local_repo(organization, project_name)
         else:
             create_local_repo(username, project_name)
     else:
         # Something went wrong
-        post_response = json.loads(re.content)
+        post_response = json.loads(r.content)
         errors = post_response.get('errors')
         if errors and errors[0]['message'] == 'name already exists on this account':
             puts('{0}. {1}'.format(colored.blue('octogit'),
@@ -197,22 +188,28 @@ def create_repository(project_name, description, organization=None):
             sys.exit(-1)
 
 
-def get_repository():
-    get_top_level_repo = 'git rev-parse --show-toplevel'
-    args = shlex.split(get_top_level_repo)
+def find_github_remote():
 
-    work_path = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+    cmdremotes = 'git remote -v'
+    args = shlex.split(cmdremotes)
 
-    stdout, sterr = work_path.communicate()
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, sterr = p.communicate()
 
-    if stdout:
-        return Repo(stdout.rstrip('\n'))
-    else:
+    if not stdout:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('You need to be inside a valid git repository.')))
         sys.exit(0)
+
+    remotes = stdout.split('\n')
+    for line in remotes:
+        name, url, _ = line.split()
+        if 'github.com' in url:
+            return url
+    else:
+        puts(colored.red('This repository has no Github remotes'))
+        sys.exit(0)
+
 
 def description_clean(string):
     new_string = ''
@@ -237,6 +234,7 @@ def get_single_issue(user, repo, number):
     puts(columns(*width))
     description = description_clean(issue['body'])
     puts(description)
+
 
 def get_issues(user, repo, assigned=None):
 
@@ -279,17 +277,20 @@ def get_issues(user, repo, assigned=None):
 
 
 def create_issue(user, repo, issue_name, description):
+
     username = get_username()
     password = get_password()
+
     if username == '' or password == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create an issue, you need to login.')))
-        sys.exit(-1)
+        sys.exit(1)
 
     post_url = ISSUES_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
-    re = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
-    if re.status_code == 201:
+
+    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    if r.status_code == 201:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
     else:

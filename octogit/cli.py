@@ -8,14 +8,11 @@ import os
 import re
 import sys
 
-from ConfigParser import ConfigParser
-
 from clint import args
 from clint.textui import colored, puts, indent
 
-from .core import (get_repository, get_issues,
-        get_single_issue, create_repository, close_issue,
-        view_issue, create_issue)
+from .core import (get_issues, get_single_issue, create_repository,
+                   close_issue, view_issue, create_issue, find_github_remote)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
@@ -66,14 +63,6 @@ def get_username_and_repo(url):
             username_repo[1]=username_repo[1].replace('.git', '')
             return username_repo
 
-def find_github_remote(repository):
-    conf = repository.get_config().__dict__.get('_values', {})
-    for key, values in conf.items():
-        if 'remote' in key and 'github' in values['url']:
-            return values['url']
-    else:
-        puts(colored.red('This repository has no Github remotes'))
-        sys.exit(0)
 
 def begin():
     if os.path.exists(CONFIG_FILE):
@@ -108,8 +97,7 @@ def begin():
             sys.exit()
 
     elif args.flags.contains(('--issues', '-i')) or args.get(0) == 'issues':
-        repo = get_repository()
-        url = find_github_remote(repo)
+        url = find_github_remote()
         username, url = get_username_and_repo(url)
         if args.get(1) == 'create':
             if args.get(2) == None:

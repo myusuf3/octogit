@@ -54,7 +54,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['requests', 'clint', 'dulwich']
+dependencies = ['requests', 'clint']
 
 setup(
     name='octogit',
