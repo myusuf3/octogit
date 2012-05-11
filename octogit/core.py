@@ -201,7 +201,7 @@ def find_github_remote():
             colored.red('You need to be inside a valid git repository.')))
         sys.exit(0)
 
-    remotes = stdout.split('\n')
+    remotes = stdout.strip().split('\n')
     for line in remotes:
         name, url, _ = line.split()
         if 'github.com' in url:
