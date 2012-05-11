@@ -66,6 +66,7 @@ setup(
     install_requires=dependencies,
     tests_require=['tox==1.3'],
     packages=['octogit', ],
+    scripts=['bin/octogit'],
     license='MIT License',
     long_description=__doc__
     )
