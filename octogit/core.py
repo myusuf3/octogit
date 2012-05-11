@@ -7,6 +7,7 @@ This file contains stuff for github api
 
 import os
 import io
+import re
 import sys
 import shlex
 import subprocess
@@ -238,50 +239,43 @@ def get_single_issue(user, repo, number):
     puts(description)
 
 def get_issues(user, repo, assigned=None):
-    import pdb; pdb.set_trace()
-    count = 0
-    github_issues_url = ISSUES_PAGE %  (user, repo)
-    json_data = []
-    while True:
-        count += 1
-        url = ISSUES_ENDPOINT % (user, repo, count)
-        if valid_credentials():
-            if assigned:
-                url += '&assignee=%s' % get_username()
-            connect = requests.get(url, auth=(get_username(), get_password()))
-        else:
-            if assigned:
-                puts('{0}. {1}'.format(colored.blue('octogit'),
-                    colored.red('Please log in to see issues assigned to you.')))
-                sys.exit(0)
-            connect = requests.get(url)
 
-        json_data += simplejson.loads(connect.content)
+    github_issues_url = 'https://api.github.com/repos/%s/%s/issues' % (user, repo)
 
-    try:
-        json_data['message']
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('Do you even have a Github account? Bad Credentials')))
-        return
-    except:
-        pass
-    if len(json_data) == 0 :
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.cyan('Looks like you are perfect welcome to the club.')))
-        return
-    get_number_issues(json_data)
-    puts('link. {0} \n'.format(colored.green(github_issues_url)))
-    puts('listing all {0} issues.'.format(colored.red(get_number_issues(json_data))))
-    for issue in json_data:
-        #skip pull requests
-        if issue['pull_request']['html_url'] != None:
-            continue
-        width = [[colored.yellow('#'+str(issue['number'])), 5],]
-        if isinstance(issue['title'], unicode):
-            issue['title'] = issue['title'].encode('utf-8')
-        width.append([issue['title'], 95])
-        width.append([colored.red('('+ issue['user']['login']+')'), None])
-        print columns(*width)
+    link = requests.head(github_issues_url).headers.get('Link', '=1>; rel="last"')
+    last = lambda url: int(re.compile('=(\d+)>; rel="last"$').search(url).group(1)) + 1
+
+    for pagenum in xrange(1, last(link)):
+        connect = requests.get(github_issues_url + '?page=%s' % pagenum)
+
+        try:
+            data = json.loads(connect.content)
+        except ValueError:
+            raise ValueError(connect.content)
+
+        if not data:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.cyan('Looks like you are perfect welcome to the club.')))
+            break
+
+        elif 'message' in data:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                                   colored.red(data['message'])))
+            sys.exit(1)
+
+        if assigned:
+            data = filter(lambda i: i['assignee'] and i['assignee']['login'] == assigned, data)
+
+        for issue in data:
+            #skip pull requests
+            if issue['pull_request']['html_url']:
+                continue
+            width = [[colored.yellow('#'+str(issue['number'])), 4],]
+            if isinstance(issue['title'], unicode):
+                issue['title'] = issue['title'].encode('utf-8')
+            width.append([issue['title'], 65])
+            # [colored.red('('+ issue['user']['login']+')'), None]  XXX: this behaves really weird
+            print columns(*width)
 
 
 def create_issue(user, repo, issue_name, description):
