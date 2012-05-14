@@ -3,7 +3,7 @@ import sys
 import ConfigParser
 
 import requests
-from clint.textui import colored, puts, indent, columns
+from clint.textui import colored, puts
 
 CONFIG_FILE = os.path.expanduser('~/.config/octogit/config.ini')
 # ran the first time login in run
