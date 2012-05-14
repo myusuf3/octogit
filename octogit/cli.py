@@ -48,6 +48,27 @@ def git_status():
     print git.status()
 
 def get_username_and_repo(url):
+    username, reponame = extract_url_details(url)
+
+    repo = get_repo_info(username, reponame)
+
+    has_issues = repo.get('has_issues')
+    fork = repo.get('fork')
+    parent = repo.get('parent')
+
+    if has_issues:
+        return (username, reponame,)
+
+    if fork and parent:
+        parent_user = parent.get('owner', {}).get('login')
+        if parent_user:
+            return (parent_user, reponame)
+
+    return (username, reponame,)
+
+
+
+def extract_url_details(url):
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
@@ -160,5 +181,3 @@ def begin():
     else:
         get_help()
         sys.exit(0)
-
-
