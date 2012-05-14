@@ -66,7 +66,11 @@ setup(
     install_requires=dependencies,
     tests_require=['tox==1.3'],
     packages=['octogit', ],
-    scripts=['bin/octogit'],
     license='MIT License',
-    long_description=__doc__
+    long_description=__doc__,
+    entry_points={
+        'console_scripts': [
+            'octogit = octogit.cli:begin',
+        ],
+    },
     )
