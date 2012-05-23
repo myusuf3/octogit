@@ -6,16 +6,21 @@ This file contains stuff for github api
 """
 
 import os
+import io
+import re
 import sys
 import shlex
 import subprocess
 import webbrowser
 import requests
-import simplejson
-from git import Repo
 from clint.textui import colored, puts, columns
 
 from .config import get_username, get_password
+
+try:
+    import json
+except ImportError:
+    import simplejson as json  # NOQA
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
@@ -40,19 +45,16 @@ def push_to_master():
     commit = subprocess.Popen(args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit.communicate()
 
 
 def create_octogit_readme():
-    filename = 'README.rst'
-    FILE = open(filename, "w")
-    FILE.write("""========
+    with io.open('README.rst', 'w') as fp:
+        fp.write(u"""========
 Octogit
 ========
 
-
 This repository has been created with Octogit.
-
 
 .. image:: http://myusuf3.github.com/octogit/assets/img/readme_image.png
 
@@ -60,15 +62,18 @@ Author
 ======
 Mahdi Yusuf (@myusuf3)
 """)
-    FILE.close()
+
+
+def git_init(repo_name):
+    git_init = "git init %s" % repo_name
+    args = shlex.split(git_init)
+    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
 
 def git_add_remote(username, repo_name):
     git_remote = "git remote add origin git@github.com:%s/%s.git" % (username, repo_name)
     args = shlex.split(git_remote)
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
 
 def git_initial_commit():
@@ -78,16 +83,15 @@ def git_initial_commit():
     commit = subprocess.Popen(args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit.communicate()
 
 
 def git_add():
     git_add  = "git add README.rst"
     args = shlex.split(git_add)
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-    stdout = commit.communicate()
+    commit = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    commit.communicate()
+
 
 def local_already(repo_name):
     # mkdir repo_name
@@ -97,6 +101,7 @@ def local_already(repo_name):
          return True
     else:
         return False
+
 
 def create_local_repo(username, repo_name):
     # mkdir repo_name
@@ -108,7 +113,7 @@ def create_local_repo(username, repo_name):
         # cd repo_name
         os.chdir('/'.join([os.getcwd(), repo_name]))
         #git init
-        repository = Repo.init(os.getcwd())
+        git_init(os.getcwd())
         # create readme
         create_octogit_readme()
         # add readme
@@ -123,15 +128,6 @@ def create_local_repo(username, repo_name):
             colored.green('this is your moment of glory; Be a hero.')))
 
 
-def get_number_issues(content):
-    count = 0
-    for issue in content:
-        if issue['pull_request']['html_url'] != None:
-            pass
-        else:
-            count +=1
-    return str(count)
-
 def close_issue(user, repo, number):
     if get_username() == '' or get_password() == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
@@ -141,7 +137,7 @@ def close_issue(user, repo, number):
     post_dict = {'state': 'close'}
     username = get_username()
     password = get_password()
-    r = requests.post(update_issue, auth=(username, password), data=simplejson.dumps(post_dict))
+    r = requests.post(update_issue, auth=(username, password), data=json.dumps(post_dict))
     if r.status_code == 200:
         puts('{0}.'.format(colored.red('closed')))
     else:
@@ -162,10 +158,10 @@ def create_repository(project_name, description, organization=None):
     if get_username() == '' or get_password() == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
-        sys.exit(-1)
+        sys.exit(1)
 
     if local_already(project_name):
-        sys.exit(-1)
+        sys.exit(1)
     post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
     username = get_username()
     password = get_password()
@@ -173,15 +169,15 @@ def create_repository(project_name, description, organization=None):
         post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
         post_url = 'https://api.github.com/user/repos'
-    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
-    if re.status_code == 201:
+    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    if r.status_code == 201:
         if organization:
             create_local_repo(organization, project_name)
         else:
             create_local_repo(username, project_name)
     else:
         # Something went wrong
-        post_response = simplejson.loads(re.content)
+        post_response = json.loads(r.content)
         errors = post_response.get('errors')
         if errors and errors[0]['message'] == 'name already exists on this account':
             puts('{0}. {1}'.format(colored.blue('octogit'),
@@ -192,22 +188,28 @@ def create_repository(project_name, description, organization=None):
             sys.exit(-1)
 
 
-def get_repository():
-    get_top_level_repo = 'git rev-parse --show-toplevel'
-    args = shlex.split(get_top_level_repo)
+def find_github_remote():
 
-    work_path = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+    cmdremotes = 'git remote -v'
+    args = shlex.split(cmdremotes)
 
-    stdout, sterr = work_path.communicate()
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, sterr = p.communicate()
 
-    if stdout:
-        return Repo(stdout.rstrip('\n'))
-    else:
+    if not stdout:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('You need to be inside a valid git repository.')))
         sys.exit(0)
+
+    remotes = stdout.strip().split('\n')
+    for line in remotes:
+        name, url, _ = line.split()
+        if 'github.com' in url:
+            return url
+    else:
+        puts(colored.red('This repository has no Github remotes'))
+        sys.exit(0)
+
 
 def description_clean(string):
     new_string = ''
@@ -226,75 +228,72 @@ def get_single_issue(user, repo, number):
     else:
         connect = requests.get(url)
 
-    issue = simplejson.loads(connect.content)
+    issue = json.loads(connect.content)
     width = [[colored.yellow('#'+str(issue['number'])), 5],]
     width.append([colored.red('('+ issue['user']['login']+')'), 15])
     puts(columns(*width))
     description = description_clean(issue['body'])
     puts(description)
 
+
 def get_issues(user, repo, assigned=None):
-    import pdb; pdb.set_trace()
-    count = 0
-    github_issues_url = ISSUES_PAGE %  (user, repo)
-    json_data = []
-    while True:
-        count += 1
-        url = ISSUES_ENDPOINT % (user, repo, count)
-        if valid_credentials():
-            if assigned:
-                url += '&assignee=%s' % get_username()
-            connect = requests.get(url, auth=(get_username(), get_password()))
-        else:
-            if assigned:
-                puts('{0}. {1}'.format(colored.blue('octogit'),
-                    colored.red('Please log in to see issues assigned to you.')))
-                sys.exit(0)
-            connect = requests.get(url)
 
-        json_data += simplejson.loads(connect.content)
+    github_issues_url = 'https://api.github.com/repos/%s/%s/issues' % (user, repo)
 
-    try:
-        json_data['message']
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('Do you even have a Github account? Bad Credentials')))
-        return
-    except:
-        pass
-    if len(json_data) == 0 :
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.cyan('Looks like you are perfect welcome to the club.')))
-        return
-    get_number_issues(json_data)
-    puts('link. {0} \n'.format(colored.green(github_issues_url)))
-    puts('listing all {0} issues.'.format(colored.red(get_number_issues(json_data))))
-    for issue in json_data:
-        #skip pull requests
-        if issue['pull_request']['html_url'] != None:
-            continue
-        width = [[colored.yellow('#'+str(issue['number'])), 5],]
-        if isinstance(issue['title'], unicode):
-            issue['title'] = issue['title'].encode('utf-8')
-        width.append([issue['title'], 95])
-        width.append([colored.red('('+ issue['user']['login']+')'), None])
-        print columns(*width)
+    link = requests.head(github_issues_url).headers.get('Link', '=1>; rel="last"')
+    last = lambda url: int(re.compile('=(\d+)>; rel="last"$').search(url).group(1)) + 1
+
+    for pagenum in xrange(1, last(link)):
+        connect = requests.get(github_issues_url + '?page=%s' % pagenum)
+
+        try:
+            data = json.loads(connect.content)
+        except ValueError:
+            raise ValueError(connect.content)
+
+        if not data:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                colored.cyan('Looks like you are perfect welcome to the club.')))
+            break
+
+        elif 'message' in data:
+            puts('{0}. {1}'.format(colored.blue('octogit'),
+                                   colored.red(data['message'])))
+            sys.exit(1)
+
+        if assigned:
+            data = filter(lambda i: i['assignee'] and i['assignee']['login'] == assigned, data)
+
+        for issue in data:
+            #skip pull requests
+            if issue['pull_request']['html_url']:
+                continue
+            width = [[colored.yellow('#'+str(issue['number'])), 4],]
+            if isinstance(issue['title'], unicode):
+                issue['title'] = issue['title'].encode('utf-8')
+            width.append([issue['title'], 65])
+            width.append([colored.red('('+ issue['user']['login']+')'), None])
+            print columns(*width)
 
 
 def create_issue(user, repo, issue_name, description):
+
     username = get_username()
     password = get_password()
+
     if username == '' or password == '':
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create an issue, you need to login.')))
-        sys.exit(-1)
+        sys.exit(1)
 
     post_url = ISSUES_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
-    re = requests.post(post_url, auth=(username, password), data=simplejson.dumps(post_dict))
-    if re.status_code == 201:
+
+    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    if r.status_code == 201:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'), 
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('something went wrong. perhaps you need to login?')))
         sys.exit(-1)
