@@ -30,7 +30,7 @@ def get_help():
 
     puts('\n{0}:'.format(colored.cyan('tentacles')))
     with indent(4):
-        puts(colored.green('octogit login'))
+        puts(colored.green('octogit login <username> <password>'))
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
         puts(colored.green('octogit issues [--assigned]'))
@@ -85,13 +85,13 @@ def begin():
         sys.exit(0)
 
     elif args.get(0) == 'create':
-        if args.get(1) == None or args.get(2) == None:
+        if args.get(1) == None:
             puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.red('You need to pass both a project name and description')))
 
         else:
             project_name = args.get(1)
-            description = args.get(2)
+            description = args.get(2) or ''
             organization = args.get(3)
             create_repository(project_name, description, organization=organization)
             sys.exit()
@@ -113,7 +113,7 @@ def begin():
 
         issue_number = None
         try:
-            issue_number = int(args.get(1))
+            issue_number = args.get(1)
         except:
             pass
         if issue_number is not None:
@@ -123,11 +123,15 @@ def begin():
             elif args.get(2) == 'view':
                 view_issue(username, url, issue_number)
                 sys.exit(0)
+            elif args.get(1) == '--assigned':
+                get_issues(username, url, args.flags.contains(('--assigned', '-a')))
+                sys.exit(0)           
             else:
                 get_single_issue(username, url, issue_number)
                 sys.exit(0)
-        get_issues(username, url, args.flags.contains(('--assigned', '-a')))
-        sys.exit(0)
+        else:
+                get_issues(username, url, False)
+                sys.exit(0)     
 
     elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :
         if args.get(1) == None or args.get(2) == None:

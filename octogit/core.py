@@ -24,6 +24,7 @@ except ImportError:
 
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
+CREATE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
 SINGLE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues/%s'
 ISSUES_PAGE = 'https://github.com/%s/%s/issues'
 SINGLE_ISSUE_PAGE = 'https://github.com/%s/%s/issues/%s'
@@ -37,7 +38,6 @@ def valid_credentials():
         return True
     else:
         return False
-
 
 def push_to_master():
     push_master = 'git push -u origin master'
@@ -147,7 +147,8 @@ def close_issue(user, repo, number):
 
 
 def view_issue(user, repo, number):
-    """Displays the specified issue in a browser
+    """
+    Displays the specified issue in a browser
     """
 
     github_view_url = SINGLE_ISSUE_PAGE % (user, repo, number)
@@ -237,7 +238,6 @@ def get_single_issue(user, repo, number):
 
 
 def get_issues(user, repo, assigned=None):
-
     github_issues_url = 'https://api.github.com/repos/%s/%s/issues' % (user, repo)
 
     link = requests.head(github_issues_url).headers.get('Link', '=1>; rel="last"')
@@ -261,8 +261,18 @@ def get_issues(user, repo, assigned=None):
                                    colored.red(data['message'])))
             sys.exit(1)
 
+
         if assigned:
-            data = filter(lambda i: i['assignee'] and i['assignee']['login'] == assigned, data)
+            for i in data:
+                print i['title']
+                try:
+                    if i['assignee']['login'] == user:
+                        pass
+                    else:
+                        data.remove(i)
+                except:
+                    data.remove(i)
+
 
         for issue in data:
             #skip pull requests
@@ -271,13 +281,12 @@ def get_issues(user, repo, assigned=None):
             width = [[colored.yellow('#'+str(issue['number'])), 4],]
             if isinstance(issue['title'], unicode):
                 issue['title'] = issue['title'].encode('utf-8')
-            width.append([issue['title'], 65])
+            width.append([issue['title'], 90])
             width.append([colored.red('('+ issue['user']['login']+')'), None])
             print columns(*width)
 
 
 def create_issue(user, repo, issue_name, description):
-
     username = get_username()
     password = get_password()
 
@@ -286,7 +295,7 @@ def create_issue(user, repo, issue_name, description):
             colored.red('in order to create an issue, you need to login.')))
         sys.exit(1)
 
-    post_url = ISSUES_ENDPOINT % (user, repo)
+    post_url = CREATE_ISSUE_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
 
     r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
