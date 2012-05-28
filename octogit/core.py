@@ -273,7 +273,7 @@ def get_issues(user, repo, assigned=None):
             width = [[colored.yellow('#'+str(issue['number'])), 4],]
             if isinstance(issue['title'], unicode):
                 issue['title'] = issue['title'].encode('utf-8')
-            width.append([issue['title'], 90])
+            width.append([issue['title'], 80])
             width.append([colored.red('('+ issue['user']['login']+')'), None])
             print columns(*width)
 
