@@ -39,6 +39,7 @@ def valid_credentials():
     else:
         return False
 
+
 def push_to_master():
     push_master = 'git push -u origin master'
     args = shlex.split(push_master)
@@ -87,7 +88,7 @@ def git_initial_commit():
 
 
 def git_add():
-    git_add  = "git add README.rst"
+    git_add = "git add README.rst"
     args = shlex.split(git_add)
     commit = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     commit.communicate()
@@ -96,9 +97,9 @@ def git_add():
 def local_already(repo_name):
     # mkdir repo_name
     if os.path.exists('/'.join([os.getcwd(), repo_name])):
-         puts('{0}. {1}'.format(colored.blue('octogit'),
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('the repository already exists locally.')))
-         return True
+        return True
     else:
         return False
 
@@ -106,7 +107,7 @@ def local_already(repo_name):
 def create_local_repo(username, repo_name):
     # mkdir repo_name
     if os.path.exists('/'.join([os.getcwd(), repo_name])):
-         puts('{0}. {1}'.format(colored.blue('octogit'),
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('the repository already exists locally.')))
     else:
         os.makedirs('/'.join([os.getcwd(), repo_name]))
@@ -240,11 +241,15 @@ def get_single_issue(user, repo, number):
 def get_issues(user, repo, assigned=None):
     github_issues_url = 'https://api.github.com/repos/%s/%s/issues' % (user, repo)
 
+    params = None
+    if assigned:
+        params = {'assignee': user}
+
     link = requests.head(github_issues_url).headers.get('Link', '=1>; rel="last"')
     last = lambda url: int(re.compile('=(\d+)>; rel="last"$').search(url).group(1)) + 1
 
     for pagenum in xrange(1, last(link)):
-        connect = requests.get(github_issues_url + '?page=%s' % pagenum)
+        connect = requests.get(github_issues_url + '?page=%s' % pagenum, params=params)
 
         try:
             data = json.loads(connect.content)
@@ -260,19 +265,6 @@ def get_issues(user, repo, assigned=None):
             puts('{0}. {1}'.format(colored.blue('octogit'),
                                    colored.red(data['message'])))
             sys.exit(1)
-
-
-        if assigned:
-            for i in data:
-                print i['title']
-                try:
-                    if i['assignee']['login'] == user:
-                        pass
-                    else:
-                        data.remove(i)
-                except:
-                    data.remove(i)
-
 
         for issue in data:
             #skip pull requests
