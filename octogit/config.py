@@ -9,6 +9,7 @@ CONFIG_FILE = os.path.expanduser('~/.config/octogit/config.ini')
 # ran the first time login in run
 config = ConfigParser.ConfigParser()
 
+
 def commit_changes():
     '''
     Write changes to the config file.
@@ -16,9 +17,10 @@ def commit_changes():
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 
+
 def create_config():
     if os.path.exists(CONFIG_FILE):
-         pass
+        pass
     else:
         os.makedirs(os.path.dirname(CONFIG_FILE))
         open(CONFIG_FILE, 'w').close()
@@ -27,13 +29,16 @@ def create_config():
         config.set('octogit', 'password', '')
         return config
 
+
 def get_password():
     config.read(CONFIG_FILE)
     return config.get('octogit', 'password')
 
+
 def get_username():
     config.read(CONFIG_FILE)
     return config.get('octogit', 'username')
+
 
 def set_password(password):
     '''
@@ -62,7 +67,6 @@ def login(username, password):
             colored.red('Do you even have a Github account? Bad Credentials')))
         sys.exit(3)
 
-
     if get_username() == username:
         pass
     else:
@@ -72,4 +76,3 @@ def login(username, password):
         pass
     else:
         set_password(password)
-

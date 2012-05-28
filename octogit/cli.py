@@ -41,6 +41,7 @@ def get_help():
         puts(colored.green('octogit issues <number> view'))
         puts('\n')
 
+
 def get_username_and_repo(url):
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
@@ -60,7 +61,7 @@ def get_username_and_repo(url):
             # matching url of this type
             # git://github.com/myusuf3/delorean.git
             username_repo = url.split('/')[3:]
-            username_repo[1]=username_repo[1].replace('.git', '')
+            username_repo[1] = username_repo[1].replace('.git', '')
             return username_repo
 
 
@@ -125,15 +126,15 @@ def begin():
                 sys.exit(0)
             elif args.get(1) == '--assigned':
                 get_issues(username, url, args.flags.contains(('--assigned', '-a')))
-                sys.exit(0)           
+                sys.exit(0)
             else:
                 get_single_issue(username, url, issue_number)
                 sys.exit(0)
         else:
                 get_issues(username, url, False)
-                sys.exit(0)     
+                sys.exit(0)
 
-    elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login' :
+    elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login':
         if args.get(1) == None or args.get(2) == None:
             puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.red('You need both a password and username to login')))
@@ -144,5 +145,3 @@ def begin():
     else:
         get_help()
         sys.exit(0)
-
-
