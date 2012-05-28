@@ -10,7 +10,7 @@ terminal? Then you will love this project.
 
 During the development of this plugin Github smartened up and introduced a new way to
 create repositories. Hopefully people who like to stay in the terminal will enjoy this
-litle cli app.
+little cli app.
 
 .. image:: https://github.com/myusuf3/octogit/raw/gh-pages/assets/img/readme_image.png
 
