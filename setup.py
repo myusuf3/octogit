@@ -54,7 +54,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['requests', 'clint']
+dependencies = ['requests', 'clint==0.3.2']
 
 setup(
     name='octogit',
@@ -63,11 +63,12 @@ setup(
     url='https://github.com/myusuf3/octogit',
     author='Mahdi Yusuf',
     author_email='yusuf.mahdi@gmail.com',
+    dependency_links = ['http://github.com/myusuf3/clint/tarball/master/#egg=clint-0.3.2'],
     install_requires=dependencies,
     tests_require=['tox==1.3'],
     packages=['octogit', ],
     license='MIT License',
-    long_description=__doc__,
+    long_description=open('README.rst').read(),
     entry_points={
         'console_scripts': [
             'octogit = octogit.cli:begin',
