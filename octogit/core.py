@@ -9,7 +9,6 @@ import os
 import io
 import re
 import sys
-import shlex
 import subprocess
 import webbrowser
 import requests
@@ -41,12 +40,9 @@ def valid_credentials():
 
 
 def push_to_master():
-    push_master = 'git push -u origin master'
-    args = shlex.split(push_master)
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-    commit.communicate()
+    cmd = ['git', 'push', '-u', 'origin', 'master']
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def create_octogit_readme():
@@ -66,32 +62,28 @@ Mahdi Yusuf (@myusuf3)
 
 
 def git_init(repo_name):
-    git_init = "git init %s" % repo_name
-    args = shlex.split(git_init)
-    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    cmd = ["git", "init", repo_name]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def git_add_remote(username, repo_name):
-    git_remote = "git remote add origin git@github.com:%s/%s.git" % (username, repo_name)
-    args = shlex.split(git_remote)
-    subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    url = "git@github.com:%s/%s.git" % (username, repo_name)
+    cmd = ["git", "remote", "add", "origin", url]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def git_initial_commit():
-    git_commit = "git commit -am 'this repository now with more tentacles care of octogit'"
-    args = shlex.split(git_commit)
-
-    commit = subprocess.Popen(args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-    commit.communicate()
+    cmd = ["git", "commit", "-am", "this repository now with more tentacles care of octogit"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def git_add():
-    git_add = "git add README.rst"
-    args = shlex.split(git_add)
-    commit = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    commit.communicate()
+    git_add = ["git", "add", "README.rst"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def local_already(repo_name):
@@ -191,12 +183,10 @@ def create_repository(project_name, description, organization=None):
 
 
 def find_github_remote():
+    cmd = ["git", "remote", "-v"]
 
-    cmdremotes = 'git remote -v'
-    args = shlex.split(cmdremotes)
-
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, sterr = p.communicate()
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, sterr = proc.communicate()
 
     if not stdout:
         puts('{0}. {1}'.format(colored.blue('octogit'),
