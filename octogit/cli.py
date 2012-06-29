@@ -135,13 +135,20 @@ def begin():
                 sys.exit(0)
 
     elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login':
-        if args.get(1) == None or args.get(2) == None:
-            puts('{0}. {1}'.format(colored.blue('octogit'),
-                colored.red('You need both a password and username to login')))
-        else:
-            username = args.get(1)
-            password = args.get(2)
-            login(username, password)
+        username = args.get(1)
+        if username is None:
+            username = raw_input("Github username: ")
+            if len(username) == 0:
+                puts("{0}. {1}".format(
+                        colored.blue("octogit"),
+                        colored.red("Username was blank")))
+
+        password = args.get(2)
+        if password is None:
+            import getpass
+            password = getpass.getpass("Password for %s: " % username)
+
+        login(username, password)
     else:
         get_help()
         sys.exit(0)
