@@ -1,5 +1,6 @@
 import os
 import sys
+import hashlib
 import ConfigParser
 
 import requests
@@ -45,7 +46,7 @@ def set_password(password):
     Given a config set the password attribute
     in the Octogit section.
     '''
-    config.set('octogit', 'password', password)
+    config.set('octogit', 'password', md5_helper(password))
     commit_changes()
 
 
@@ -72,7 +73,14 @@ def login(username, password):
     else:
         set_username(username)
 
-    if get_password() == password:
+    # get_password() retrieves the encrypted password
+    if get_password() == md5_helper(password):
         pass
     else:
         set_password(password)
+
+
+def md5_helper(arg):
+    m = hashlib.md5()
+    m.update(arg)
+    return m.digest()
