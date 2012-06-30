@@ -30,7 +30,7 @@ def get_help():
 
     puts('\n{0}:'.format(colored.cyan('tentacles')))
     with indent(4):
-        puts(colored.green('octogit login <username> <password>'))
+        puts(colored.green('octogit login'))
         puts(colored.green("octogit create <repo> 'description'"))
         puts(colored.green("octogit create <repo> 'description' <organization>"))
         puts(colored.green('octogit issues [--assigned]'))
