@@ -23,7 +23,7 @@ Using Octogit
 
 Available commands. ::
 
-    octogit login <username> <password> 
+    octogit login 
     # allows you to store your github authentication data 
 
     octogit create <reponame> 'description' 
