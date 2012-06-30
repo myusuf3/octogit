@@ -81,7 +81,7 @@ def git_initial_commit():
 
 
 def git_add():
-    git_add = ["git", "add", "README.rst"]
+    cmd = ["git", "add", "README.rst"]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.communicate()
 
