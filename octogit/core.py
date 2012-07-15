@@ -12,6 +12,7 @@ import sys
 import subprocess
 import webbrowser
 import requests
+import pprint
 from clint.textui import colored, puts, columns
 
 from .config import get_username, get_password
@@ -227,6 +228,49 @@ def get_single_issue(user, repo, number):
     description = description_clean(issue['body'])
     puts(description)
 
+def view_gist(gist_id):
+    """
+    Displays the specified gist in a browser
+    """
+
+    github_view_url = 'https://gist.github.com/gists/%s' % (gist_id)
+    webbrowser.open(github_view_url)
+
+def get_gists(user):
+	github_gists_url = 'https://api.github.com/users/%s/gists' % (user)
+	gists = requests.get(github_gists_url)
+	try:
+		data = json.loads(gists.content)
+	except ValueError:
+		raise ValueError(gists.content)
+	
+	pp = pprint.PrettyPrinter(indent=4)
+	for gist in data:
+		width = [[colored.yellow('#'+str(gist['id'])), 2],]
+		width.append(['{0}'.format(gist['description']), 70])
+	
+		if len(gist['files']) == 1:
+			for file in gist['files']:
+				width.append([colored.blue("size:"), 6])
+				width.append(["{0}".format(gist['files'][file]['size']), 8])
+				width.append([colored.blue("language:"), 10])
+				width.append(["{0}".format(gist['files'][file]['language']), 10])
+	
+		print columns(*width)
+		
+		if (len(gist['files']) != 1):
+			for file in gist['files']:
+				width = [["",2]]
+				width.append([colored.blue("file:"), 6])
+				width.append([file, 25])
+				width.append([colored.blue("size:"), 6])
+				width.append(["{0}".format(gist['files'][file]['size']), 6])
+				width.append([colored.blue("language:"), 10])
+				width.append(["{0}".format(gist['files'][file]['language']), 10])
+				print columns(*width)
+		
+	#for gist in data:
+	#	puts(gist)  
 
 def get_issues(user, repo, assigned=None):
     github_issues_url = 'https://api.github.com/repos/%s/%s/issues' % (user, repo)
