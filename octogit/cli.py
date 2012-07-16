@@ -112,11 +112,8 @@ def begin():
                 create_issue(username, url, issue_name, description)
                 sys.exit(0)
 
-        issue_number = None
-        try:
-            issue_number = args.get(1)
-        except:
-            pass
+        issue_number = args.get(1)
+
         if issue_number is not None:
             if args.get(2) == 'close':
                 close_issue(username, url, issue_number)
