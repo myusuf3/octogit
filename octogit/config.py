@@ -44,6 +44,13 @@ def get_username():
     config.read(CONFIG_FILE)
     return config.get('octogit', 'username')
 
+def get_headers(headers=()):
+    defaults = {"Authorization": "token %s" % get_token()}
+    defaults.update(headers)
+    return defaults
+
+def have_credentials():
+    get_username() != '' and get_token() != ''
 
 def set_token(token):
     '''
@@ -65,7 +72,8 @@ def set_username(username):
 
 def login(username, password):
     body = json.dumps({ "note": "octogit",
-                        "note_url": "https://github.com/myusuf3/octogit"})
+                        "note_url": "https://github.com/myusuf3/octogit",
+                        "scopes": ["repo"]})
     r = requests.post('https://api.github.com/authorizations',
             auth=(username, password), data=body)
     if r.status_code == 201:

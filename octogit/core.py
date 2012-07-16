@@ -14,7 +14,7 @@ import webbrowser
 import requests
 from clint.textui import colored, puts, columns
 
-from .config import get_username, get_password
+from .config import get_username, get_headers, have_credentials
 
 try:
     import json
@@ -32,7 +32,7 @@ UPDATE_ISSUE = 'https://api.github.com/repos/%s/%s/issues/%s'
 
 
 def valid_credentials():
-    r = requests.get('https://api.github.com', auth=(get_username(), get_password()))
+    r = requests.get('https://api.github.com', headers=get_headers())
     if r.status_code == 200:
         return True
     else:
@@ -122,15 +122,13 @@ def create_local_repo(username, repo_name):
 
 
 def close_issue(user, repo, number):
-    if get_username() == '' or get_password() == '':
+    if have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(-1)
     update_issue = UPDATE_ISSUE % (user, repo, number)
     post_dict = {'state': 'close'}
-    username = get_username()
-    password = get_password()
-    r = requests.post(update_issue, auth=(username, password), data=json.dumps(post_dict))
+    r = requests.post(update_issue, headers=get_headers(), data=json.dumps(post_dict))
     if r.status_code == 200:
         puts('{0}.'.format(colored.red('closed')))
     else:
@@ -149,7 +147,7 @@ def view_issue(user, repo, number):
 
 
 def create_repository(project_name, description, organization=None):
-    if get_username() == '' or get_password() == '':
+    if have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(1)
@@ -157,13 +155,11 @@ def create_repository(project_name, description, organization=None):
     if local_already(project_name):
         sys.exit(1)
     post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
-    username = get_username()
-    password = get_password()
     if organization:
         post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
         post_url = 'https://api.github.com/user/repos'
-    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    r = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
     if r.status_code == 201:
         if organization:
             create_local_repo(organization, project_name)
@@ -216,7 +212,7 @@ def get_single_issue(user, repo, number):
     github_single_url = SINGLE_ISSUE_PAGE % (user, repo, number)
     puts('link. {0} \n'.format(colored.green(github_single_url)))
     if valid_credentials():
-        connect = requests.get(url, auth=(get_username(), get_password()))
+        connect = requests.get(url, headers=get_headers())
     else:
         connect = requests.get(url)
 
@@ -269,10 +265,7 @@ def get_issues(user, repo, assigned=None):
 
 
 def create_issue(user, repo, issue_name, description):
-    username = get_username()
-    password = get_password()
-
-    if username == '' or password == '':
+    if have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create an issue, you need to login.')))
         sys.exit(1)
@@ -280,7 +273,7 @@ def create_issue(user, repo, issue_name, description):
     post_url = CREATE_ISSUE_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
 
-    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    r = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
     if r.status_code == 201:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
