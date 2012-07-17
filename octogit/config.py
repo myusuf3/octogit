@@ -34,11 +34,20 @@ def create_config():
         config.set('octogit', 'token', '')
         return config
 
-
 def get_token():
     config.read(CONFIG_FILE)
-    return config.get('octogit', 'token')
-
+    # Catch edgecase where user hasn't migrated to tokens
+    try:
+        return config.get('octogit', 'token')
+    except ConfigParser.NoOptionError:
+        if get_username() != "":
+            puts(colored.green("We're just migrating your account from plaintext passwords to OAuth tokens"))
+            login(get_username(), config.get('octogit', 'password'))
+            config.remove_option('octogit', 'password')
+            puts(colored.green("Pretty spiffy huh?"))
+            return config.get('octogit', 'token')
+        else:
+            raise
 
 def get_username():
     config.read(CONFIG_FILE)
