@@ -16,10 +16,6 @@ from .core import (get_issues, get_single_issue, create_repository,
                    close_issue, view_issue, create_issue, find_github_remote)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
-try:
-    import json
-except ImportError:
-    import simplejson as json  # NOQA
 
 GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
 
@@ -50,7 +46,6 @@ def get_help():
 
 
 def get_parent_repository(username_repo):
-    import pdb; pdb.set_trace()
     username, repo = username_repo
     url = GIT_REPO_ENDPOINT % (username, repo)
     response = requests.get(url)
