@@ -7,6 +7,7 @@ this file contains all the helper cli commands for octogit
 import os
 import re
 import sys
+import requests
 
 from clint import args
 from clint.textui import colored, puts, indent
@@ -15,6 +16,12 @@ from .core import (get_issues, get_single_issue, create_repository,
                    close_issue, view_issue, create_issue, find_github_remote)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
+try:
+    import json
+except ImportError:
+    import simplejson as json  # NOQA
+
+GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
 
 def version():
     from . import __version__
@@ -42,7 +49,22 @@ def get_help():
         puts('\n')
 
 
+def get_parent_repository(username_repo):
+    import pdb; pdb.set_trace()
+    username, repo = username_repo
+    url = GIT_REPO_ENDPOINT % (username, repo)
+    response = requests.get(url)
+    data = response.json
+    try:
+        parent = data['parent']['full_name']
+        username_repo = parent.split('/')
+    except KeyError:
+        pass
+    return username_repo
+
+
 def get_username_and_repo(url):
+
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
@@ -56,13 +78,15 @@ def get_username_and_repo(url):
         if username_repo[0] == '':
             username_repo = username_repo[1:]
         if len(username_repo) == 2:
-            return username_repo
+            info = username_repo
         else:
             # matching url of this type
             # git://github.com/myusuf3/delorean.git
             username_repo = url.split('/')[3:]
             username_repo[1] = username_repo[1].replace('.git', '')
-            return username_repo
+            info = username_repo
+    parent_repo = get_parent_repository(info)
+    return parent_repo
 
 
 def begin():
