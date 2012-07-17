@@ -94,12 +94,5 @@ def login(username, password):
     data = json.loads(r.content)
     token = data["token"]
 
-    if get_username() == username:
-        pass
-    else:
-        set_username(username)
-
-    if get_token() == token:
-        pass
-    else:
-        set_token(token)
+    set_username(username)
+    set_token(token)
