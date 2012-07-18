@@ -38,6 +38,13 @@ Available commands. ::
     octogit issues <number> close 
     # lets you close an issue
 
+    octogit gists delete <number>
+    # lets you delete a gist
+
+    octogit gists create <file1> <file2> <fileN> 'description'
+    # lets you create a gist with one or more files
+    # accepts absolute and relative file paths
+
 
 Contribute
 ==========

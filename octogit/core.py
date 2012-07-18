@@ -288,3 +288,37 @@ def create_issue(user, repo, issue_name, description):
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('something went wrong. perhaps you need to login?')))
         sys.exit(-1)
+
+
+def delete_gist(gist_id):
+    delete_url = 'https://api.github.com/gists/%s' % (gist_id)
+    username = get_username()
+    password = get_password()
+
+    r = requests.delete(delete_url, auth=(username, password))
+    if r.status_code == 204:
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.green('gist deleted successfully')))
+    else:
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red("You either passed a gist that isn't yours or you need to login silly.")))
+        sys.exit(-1)
+
+
+def create_gist(files, description):
+    post_url = 'https://api.github.com/gists'
+    username = get_username()
+    password = get_password()
+
+    post_dict = {'description': description, 'public': True}
+    file_name = lambda x: x.split('/')[-1]
+    post_dict['files'] = dict((file_name(file), {'content': open(file).read()}) for file in files)
+
+    r = requests.post(post_url, auth=(username, password), data=json.dumps(post_dict))
+    if r.status_code == 201:
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.green('gist created successfully')))
+    else:
+        puts('{0}. {1}'.format(colored.blue('octogit'),
+            colored.red('You need to login to create a gist')))
+        sys.exit(-1)
