@@ -13,7 +13,7 @@ from clint import args
 from clint.textui import colored, puts, indent
 
 from .core import (get_issues, get_single_issue, create_repository,
-                   close_issue, view_issue, create_issue, find_github_remote)
+                   close_issue, view_issue, create_issue, find_github_remote, get_username, get_gists, view_gist)
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
@@ -42,6 +42,10 @@ def get_help():
         puts(colored.green('octogit issues <number>'))
         puts(colored.green('octogit issues <number> close'))
         puts(colored.green('octogit issues <number> view'))
+        puts(colored.green('octogit gists'))
+        puts(colored.green('octogit gists <user>'))
+        puts(colored.green('octogit gists <number> view'))
+
         puts('\n')
 
 
@@ -165,6 +169,18 @@ def begin():
             password = getpass.getpass("Password for %s: " % username)
 
         login(username, password)
+
+    elif args.get(0) == 'gists':
+        if args.get(1) == None:
+            username = get_username()
+        else:
+            username = args.get(1)
+
+        if args.get(2) != None and args.get(2) == 'view':
+			gist_id = args.get(1)
+			view_gist(gist_id)
+        else:
+	        get_gists(username)
     else:
         get_help()
         sys.exit(0)

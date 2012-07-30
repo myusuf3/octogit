@@ -38,6 +38,14 @@ Available commands. ::
     octogit issues <number> close 
     # lets you close an issue
 
+    octogit gists
+    # let's you view your own gists
+
+    octogit gists <user>
+    # let's you view a users gists	
+
+    octogit gists <number> view
+    # opens up a web browser with that gist
 
 Contribute
 ==========
