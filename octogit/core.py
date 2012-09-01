@@ -122,7 +122,7 @@ def create_local_repo(username, repo_name):
 
 
 def close_issue(user, repo, number):
-    if have_credentials():
+    if not have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(-1)
@@ -147,7 +147,7 @@ def view_issue(user, repo, number):
 
 
 def create_repository(project_name, description, organization=None):
-    if have_credentials():
+    if not have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(1)
@@ -265,7 +265,7 @@ def get_issues(user, repo, assigned=None):
 
 
 def create_issue(user, repo, issue_name, description):
-    if have_credentials():
+    if not have_credentials():
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create an issue, you need to login.')))
         sys.exit(1)
