@@ -220,7 +220,7 @@ def get_single_issue(user, repo, number):
     width = [[colored.yellow('#'+str(issue['number'])), 5],]
     width.append([colored.red('('+ issue['user']['login']+')'), 15])
     puts(columns(*width))
-    description = description_clean(issue['body'])
+    description = description_clean(issue['body'].encode('utf-8'))
     puts(description)
 
 
