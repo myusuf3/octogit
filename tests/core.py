@@ -19,7 +19,7 @@ class UTF8Support(unittest.TestCase):
             else:
                 pass
 
-    def test_assert_not_raises_UnicodeDecodeError(self):
+    def test_assert_not_raises_UnicodeEncodeError(self):
         self.assertNotRaises(UnicodeEncodeError, get_single_issue,
             kwargs={'user':'cesarFrias', 'repo':'pomodoro4linux',
             'number':2})
