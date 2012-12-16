@@ -134,7 +134,7 @@ def begin():
         issue_number = args.get(1)
 
         if issue_number is not None:
-            if issue_number.startwith('#'):
+            if issue_number.startswith('#'):
                 issue_number = issue_number[1:]
 
             if args.get(2) == 'close':
