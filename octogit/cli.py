@@ -132,6 +132,8 @@ def begin():
                 sys.exit(0)
 
         issue_number = args.get(1)
+        if issue_number.startwith('#'):
+            issue_number = issue_number[1:]
 
         if issue_number is not None:
             if args.get(2) == 'close':
