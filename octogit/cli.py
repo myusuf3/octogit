@@ -49,7 +49,7 @@ def get_parent_repository(username_repo):
     username, repo = username_repo
     url = GIT_REPO_ENDPOINT % (username, repo)
     response = requests.get(url)
-    data = response.json
+    data = response.json()
     try:
         parent = data['parent']['full_name']
         username_repo = parent.split('/')
