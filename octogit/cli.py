@@ -9,6 +9,7 @@ import re
 import sys
 import requests
 
+import docopt
 from clint import args
 from clint.textui import colored, puts, indent
 
