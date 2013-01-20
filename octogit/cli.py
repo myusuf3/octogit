@@ -9,7 +9,7 @@ import re
 import sys
 import requests
 
-import docopt
+from docopt import docopt
 from clint import args
 from clint.textui import colored, puts, indent
 
@@ -86,6 +86,20 @@ def get_username_and_repo(url):
 
 
 def begin():
+    """
+    Usage:
+      octogit login
+      octogit create <repo> <'description'>
+      octogit create <repo> <'description'> <organization>
+      octogit issues [--assigned]
+      octogit issues create <'issue-title'> <'description'>
+      octogit issues <number>
+      octogit issues <number> close
+      octogit issues <number> view
+      octogit -v | --version
+
+      """
+
     if os.path.exists(CONFIG_FILE):
         pass
     else:
