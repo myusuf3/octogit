@@ -88,6 +88,7 @@ def get_username_and_repo(url):
 def begin():
     """
     Usage:
+      octogit [subcommand] [arguments]
       octogit login
       octogit create <repo> <'description'>
       octogit create <repo> <'description'> <organization>
