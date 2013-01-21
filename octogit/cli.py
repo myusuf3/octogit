@@ -97,6 +97,7 @@ def begin():
       octogit issues <number> close
       octogit issues <number> view
       octogit -v | --version
+      octogit help | -h | --help
 
       """
 
@@ -108,14 +109,13 @@ def begin():
         # commit changes
         commit_changes()
 
-    if args.flags.contains(('--version', '-v')):
+    arguments = docopt(begin.__doc__, help=None)
+
+    if arguments['--version'] or arguments['-v']:
         puts(version())
         sys.exit(0)
 
-    elif args.get(0) == None:
-        get_help()
-
-    elif args.flags.contains(('--help', '-h')) or args.get(0) == 'help':
+    elif arguments['--help'] or arguments['-h'] or arguments['help']:
         get_help()
         sys.exit(0)
 
