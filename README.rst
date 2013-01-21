@@ -43,6 +43,3 @@ Contribute
 ==========
 If you would like to contribute simply fork this project and add yourself to the AUTHORS.txt along with some changes hopefully and submit a pull request.
 
-test words round 2
-
-
