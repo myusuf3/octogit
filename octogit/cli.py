@@ -89,14 +89,12 @@ def begin():
     """
     Usage:
       octogit [subcommand] [arguments]
-      octogit login
+      octogit login | -l | --login
       octogit create <repo> <'description'>
       octogit create <repo> <'description'> <organization>
-      octogit issues [--assigned]
-      octogit issues create <'issue-title'> <'description'>
-      octogit issues <number>
-      octogit issues <number> close
-      octogit issues <number> view
+      octogit (issues | -i | --issues) [--assigned]
+      octogit (issues | -i | --issues) create <'issue-title'> <'description'>
+      octogit (issues | -i | --issues) <number> [close | view]
       octogit -v | --version
       octogit help | -h | --help
 
@@ -120,7 +118,7 @@ def begin():
         get_help()
         sys.exit(0)
 
-    elif args.get(0) == 'create':
+    elif arguments['create']:
         if args.get(1) == None:
             puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.red('You need to pass both a project name and description')))
@@ -132,7 +130,7 @@ def begin():
             create_repository(project_name, description, organization=organization)
             sys.exit()
 
-    elif args.flags.contains(('--issues', '-i')) or args.get(0) == 'issues':
+    elif arguments['--issues'] or arguments['-i'] or arguments['issues']:
         url = find_github_remote()
         username, url = get_username_and_repo(url)
         if args.get(1) == 'create':
@@ -169,7 +167,7 @@ def begin():
                 get_issues(username, url, False)
                 sys.exit(0)
 
-    elif args.flags.contains(('--login', '-l')) or args.get(0) == 'login':
+    elif arguments['--login'] or arguments['-l'] or arguments['login']:
         username = args.get(1)
         if username is None:
             username = raw_input("Github username: ")
