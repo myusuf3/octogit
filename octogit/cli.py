@@ -89,11 +89,10 @@ def begin():
     """
     Usage:
       octogit [subcommand] [arguments]
-      octogit login | -l | --login
-      octogit create <repo> <'description'>
-      octogit create <repo> <'description'> <organization>
-      octogit (issues | -i | --issues) [--assigned]
-      octogit (issues | -i | --issues) create <'issue-title'> <'description'>
+      octogit login | -l | --login [(username password)]
+      octogit create <repo> [<description>] [<organization>]
+      octogit (issues | -i | --issues) [--assigned | -a]
+      octogit (issues | -i | --issues) create <issue-title> <description>
       octogit (issues | -i | --issues) <number> [close | view]
       octogit -v | --version
       octogit help | -h | --help
@@ -119,46 +118,46 @@ def begin():
         sys.exit(0)
 
     elif arguments['create']:
-        if args.get(1) == None:
+        if arguments['<repo>'] == None:
             puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.red('You need to pass both a project name and description')))
 
         else:
-            project_name = args.get(1)
-            description = args.get(2) or ''
-            organization = args.get(3)
+            project_name = arguments['<repo>']
+            description = arguments['<description>'] or ''
+            organization = arguments['<organization>']
             create_repository(project_name, description, organization=organization)
             sys.exit()
 
     elif arguments['--issues'] or arguments['-i'] or arguments['issues']:
         url = find_github_remote()
         username, url = get_username_and_repo(url)
-        if args.get(1) == 'create':
-            if args.get(2) == None:
+        if arguments['create']:
+            if ['<issue-title>'] == None:
                 puts('{0}. {1}'.format(colored.blue('octogit'),
                     colored.red('You need to pass an issue title')))
                 sys.exit(-1)
 
             else:
-                issue_name = args.get(2)
-                description = args.get(3)
+                issue_name = arguments['<issue-title>']
+                description = arguments['<description>']
                 create_issue(username, url, issue_name, description)
                 sys.exit(0)
 
-        issue_number = args.get(1)
+        issue_number = arguments['<number>']
 
         if issue_number is not None:
             if issue_number.startswith('#'):
                 issue_number = issue_number[1:]
 
-            if args.get(2) == 'close':
+            if arguments['close']:
                 close_issue(username, url, issue_number)
                 sys.exit(0)
-            elif args.get(2) == 'view':
+            elif arguments['view']:
                 view_issue(username, url, issue_number)
                 sys.exit(0)
-            elif args.get(1) == '--assigned':
-                get_issues(username, url, args.flags.contains(('--assigned', '-a')))
+            elif arguments['--assigned']:
+                get_issues(username, url, (arguments['-assigned'] or arguments['-a']))
                 sys.exit(0)
             else:
                 get_single_issue(username, url, issue_number)
@@ -168,7 +167,7 @@ def begin():
                 sys.exit(0)
 
     elif arguments['--login'] or arguments['-l'] or arguments['login']:
-        username = args.get(1)
+        username = arguments['username']
         if username is None:
             username = raw_input("Github username: ")
             if len(username) == 0:
@@ -176,7 +175,7 @@ def begin():
                         colored.blue("octogit"),
                         colored.red("Username was blank")))
 
-        password = args.get(2)
+        password = arguments['password']
         if password is None:
             import getpass
             password = getpass.getpass("Password for %s: " % username)
