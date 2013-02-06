@@ -125,7 +125,7 @@ def begin():
         else:
             project_name = arguments['<repo>']
             description = arguments['<description>'] or ''
-            organization = arguments['<organization>']
+            organization = arguments['<organization>'] or None
             create_repository(project_name, description, organization=organization)
             sys.exit()
 
