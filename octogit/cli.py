@@ -167,7 +167,7 @@ def begin():
                 sys.exit(0)
 
     elif arguments['--login'] or arguments['-l'] or arguments['login']:
-        username = arguments['username']
+        username = arguments['username'] or None
         if username is None:
             username = raw_input("Github username: ")
             if len(username) == 0:
@@ -175,7 +175,7 @@ def begin():
                         colored.blue("octogit"),
                         colored.red("Username was blank")))
 
-        password = arguments['password']
+        password = arguments['password'] or None
         if password is None:
             import getpass
             password = getpass.getpass("Password for %s: " % username)
