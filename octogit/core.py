@@ -164,7 +164,7 @@ def create_repository(project_name, description, organization=None):
         if organization:
             create_local_repo(organization, project_name)
         else:
-            create_local_repo(username, project_name)
+            create_local_repo(get_username(), project_name)
     else:
         # Something went wrong
         post_response = json.loads(r.content)
