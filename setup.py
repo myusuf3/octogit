@@ -54,7 +54,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['clint2','requests>=1.0']
+dependencies = ['clint2','requests>=1.0', 'docopt']
 
 setup(
     name='octogit',

@@ -59,7 +59,7 @@ def get_headers(headers=()):
     return defaults
 
 def have_credentials():
-    get_username() != '' and get_token() != ''
+    return get_username() != '' and get_token() != ''
 
 def set_token(token):
     '''
