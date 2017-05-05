@@ -87,6 +87,8 @@ def login(username, password):
             auth=(username, password), data=body)
     if r.status_code == 201:
         puts(colored.green('You have successfully been authenticated with Github'))
+    elif: r.status_code == 422:
+        puts(colored.green('An access token already exists!')) 
     else:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('Do you even have a Github account? Bad Credentials')))
