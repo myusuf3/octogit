@@ -12,30 +12,42 @@ except ImportError:
 
 CONFIG_FILE = os.path.expanduser('~/.config/octogit/config.ini')
 # ran the first time login in run
-config = ConfigParser.ConfigParser()
+# config = ConfigParser.ConfigParser()
 
+def get_parser():
+    try:
+        config = ConfigParser.ConfigParser()
+        config.read(CONFIG_FILE)
+    except Exception as e:
+        puts(colored.red("ERROR: Attempting to get config parser failed: {}".format(e)))
+        config = None
+    return config
 
-def commit_changes():
+def commit_changes(config):
     '''
     Write changes to the config file.
     '''
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 
-
 def create_config():
-    if os.path.exists(CONFIG_FILE):
+    # If this returns False, file does not exist
+    if os.path.isfile(CONFIG_FILE):
         pass
     else:
-        os.makedirs(os.path.dirname(CONFIG_FILE))
+        # need an extra check here in cases where the path exists
+        # but the file doesn't (if it was renamed)
+        if not os.path.exists(os.path.dirname(CONFIG_FILE)):
+            os.makedirs(os.path.dirname(CONFIG_FILE))
         open(CONFIG_FILE, 'w').close()
+        config = get_parser()
         config.add_section('octogit')
         config.set('octogit', 'username', '')
         config.set('octogit', 'token', '')
-        return config
+        commit_changes(config)
 
 def get_token():
-    config.read(CONFIG_FILE)
+    config = get_parser()    
     # Catch edgecase where user hasn't migrated to tokens
     try:
         return config.get('octogit', 'token')
@@ -50,7 +62,7 @@ def get_token():
             raise
 
 def get_username():
-    config.read(CONFIG_FILE)
+    config = get_parser()    
     return config.get('octogit', 'username')
 
 def get_headers(headers=()):
@@ -66,8 +78,9 @@ def set_token(token):
     Given a config set the token attribute
     in the Octogit section.
     '''
+    config = get_parser()
     config.set('octogit', 'token', token)
-    commit_changes()
+    commit_changes(config)
 
 
 def set_username(username):
@@ -75,9 +88,9 @@ def set_username(username):
     Given a config set the username attribute
     in the Octogit section.
     '''
+    config = get_parser()
     config.set('octogit', 'username', username)
-    commit_changes()
-
+    commit_changes(config)
 
 def login(username, password):
     body = json.dumps({ "note": "octogit",
@@ -87,14 +100,15 @@ def login(username, password):
             auth=(username, password), data=body)
     if r.status_code == 201:
         puts(colored.green('You have successfully been authenticated with Github'))
-    elif: r.status_code == 422:
-        puts(colored.green('An access token already exists!')) 
+        data = json.loads(r.content)
+        token = data["token"]
+        set_username(username)
+        set_token(token)
+    elif r.status_code == 422:
+        puts(colored.red('An access token already exists! Exiting...')) 
+        sys.exit()
     else:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('Do you even have a Github account? Bad Credentials')))
         sys.exit(3)
-    data = json.loads(r.content)
-    token = data["token"]
 
-    set_username(username)
-    set_token(token)
