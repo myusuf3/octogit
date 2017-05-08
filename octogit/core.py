@@ -254,15 +254,19 @@ def get_issues(user, repo, assigned=None):
 
         for issue in data:
             #skip pull requests
-            if issue['pull_request']['html_url']:
-                continue
-            width = [[colored.yellow('#'+str(issue['number'])), 4],]
-            if isinstance(issue['title'], unicode):
-                issue['title'] = issue['title'].encode('utf-8')
-            width.append([issue['title'], 80])
-            width.append([colored.red('('+ issue['user']['login']+')'), None])
-            print columns(*width)
-
+            try:
+                if issue['pull_request']['html_url']:
+                    continue
+                width = [[colored.yellow('#'+str(issue['number'])), 4],]
+                if isinstance(issue['title'], unicode):
+                    issue['title'] = issue['title'].encode('utf-8')
+                width.append([issue['title'], 80])
+                width.append([colored.red('('+ issue['user']['login']+')'), None])
+                print columns(*width)
+            except IndexError as err:
+                puts('{0}.Error: {1} triggered -- {2}'.format(colored.blue('octogit'),
+                                                              colored.red('Keyerror'),
+                                                              colored.red(err))) 
 
 def create_issue(user, repo, issue_name, description):
     if not have_credentials():
