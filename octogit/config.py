@@ -27,7 +27,11 @@ def create_config():
     if os.path.exists(CONFIG_FILE):
         pass
     else:
-        os.makedirs(os.path.dirname(CONFIG_FILE))
+        try:
+            os.makedirs(os.path.dirname(CONFIG_FILE))
+        except OSError as e:
+            if e.errno != os.errno.EEXIST:
+                raise
         open(CONFIG_FILE, 'w').close()
         config.add_section('octogit')
         config.set('octogit', 'username', '')
