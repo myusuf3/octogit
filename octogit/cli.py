@@ -104,8 +104,9 @@ def begin():
     else:
         # create config file
         create_config()
-        # commit changes
-        commit_changes()
+        # commit changes (now this is called
+        # automatically after create_config()
+        # commit_changes()
 
     arguments = docopt(begin.__doc__, help=None)
 
