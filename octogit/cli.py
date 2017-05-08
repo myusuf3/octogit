@@ -133,7 +133,7 @@ def begin():
         url = find_github_remote()
         username, url = get_username_and_repo(url)
         if arguments['create']:
-            if ['<issue-title>'] == None:
+            if ['<issue-title>'] is None:
                 puts('{0}. {1}'.format(colored.blue('octogit'),
                     colored.red('You need to pass an issue title')))
                 sys.exit(-1)
