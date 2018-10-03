@@ -14,6 +14,7 @@ CONFIG_FILE = os.path.expanduser('~/.config/octogit/config.ini')
 # ran the first time login in run
 # config = ConfigParser.ConfigParser()
 
+
 def get_parser():
     try:
         config = ConfigParser.ConfigParser()
@@ -23,12 +24,14 @@ def get_parser():
         config = None
     return config
 
+
 def commit_changes(config):
-    '''
+    """
     Write changes to the config file.
-    '''
+    """
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
+
 
 def create_config():
     # If this returns False, file does not exist
@@ -46,6 +49,7 @@ def create_config():
         config.set('octogit', 'token', '')
         commit_changes(config)
 
+
 def get_token():
     config = get_parser()    
     # Catch edgecase where user hasn't migrated to tokens
@@ -61,43 +65,48 @@ def get_token():
         else:
             raise
 
+
 def get_username():
     config = get_parser()    
     return config.get('octogit', 'username')
+
 
 def get_headers(headers=()):
     defaults = {"Authorization": "token %s" % get_token()}
     defaults.update(headers)
     return defaults
 
+
 def have_credentials():
     return get_username() != '' and get_token() != ''
 
+
 def set_token(token):
-    '''
+    """
     Given a config set the token attribute
     in the Octogit section.
-    '''
+    """
     config = get_parser()
     config.set('octogit', 'token', token)
     commit_changes(config)
 
 
 def set_username(username):
-    '''
+    """
     Given a config set the username attribute
     in the Octogit section.
-    '''
+    """
     config = get_parser()
     config.set('octogit', 'username', username)
     commit_changes(config)
 
+
 def login(username, password):
-    body = json.dumps({ "note": "octogit",
-                        "note_url": "https://github.com/myusuf3/octogit",
-                        "scopes": ["repo"]})
+    body = json.dumps({"note": "octogit",
+                       "note_url": "https://github.com/myusuf3/octogit",
+                       "scopes": ["repo"]})
     r = requests.post('https://api.github.com/authorizations',
-            auth=(username, password), data=body)
+                      auth=(username, password), data=body)
     if r.status_code == 201:
         puts(colored.green('You have successfully been authenticated with Github'))
         data = json.loads(r.content)
@@ -109,6 +118,6 @@ def login(username, password):
         sys.exit()
     else:
         puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red('Do you even have a Github account? Bad Credentials')))
+                               colored.red('Do you even have a Github account? Bad Credentials')))
         sys.exit(3)
 

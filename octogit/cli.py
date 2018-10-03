@@ -9,16 +9,17 @@ import re
 import sys
 import requests
 
+from six.moves import input
 from docopt import docopt
-from clint import args
 from clint.textui import colored, puts, indent
 
 from .core import (get_issues, get_single_issue, create_repository,
                    close_issue, view_issue, create_issue, find_github_remote)
-from .config import login, create_config, commit_changes, CONFIG_FILE
+from .config import login, create_config, CONFIG_FILE
 
 
 GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
+
 
 def version():
     from . import __version__
@@ -119,7 +120,7 @@ def begin():
         sys.exit(0)
 
     elif arguments['create']:
-        if arguments['<repo>'] == None:
+        if arguments['<repo>'] is None:
             puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.red('You need to pass both a project name and description')))
 
@@ -134,7 +135,7 @@ def begin():
         url = find_github_remote()
         username, url = get_username_and_repo(url)
         if arguments['create']:
-            if ['<issue-title>'] == None:
+            if ['<issue-title>'] is None:
                 puts('{0}. {1}'.format(colored.blue('octogit'),
                     colored.red('You need to pass an issue title')))
                 sys.exit(-1)
@@ -170,7 +171,7 @@ def begin():
     elif arguments['--login'] or arguments['-l'] or arguments['login']:
         username = arguments['username'] or None
         if username is None:
-            username = raw_input("Github username: ")
+            username = input("Github username: ")
             if len(username) == 0:
                 puts("{0}. {1}".format(
                         colored.blue("octogit"),

@@ -12,6 +12,10 @@ import sys
 import subprocess
 import webbrowser
 import requests
+
+from six.moves import xrange
+from six import print_
+
 from clint.textui import colored, puts, columns
 
 from .config import get_username, get_headers, have_credentials
@@ -262,11 +266,12 @@ def get_issues(user, repo, assigned=None):
                     issue['title'] = issue['title'].encode('utf-8')
                 width.append([issue['title'], 80])
                 width.append([colored.red('('+ issue['user']['login']+')'), None])
-                print columns(*width)
+                print_(columns(*width))
             except IndexError as err:
                 puts('{0}.Error: {1} triggered -- {2}'.format(colored.blue('octogit'),
                                                               colored.red('Keyerror'),
                                                               colored.red(err))) 
+
 
 def create_issue(user, repo, issue_name, description):
     if not have_credentials():
