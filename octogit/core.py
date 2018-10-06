@@ -25,7 +25,6 @@ try:
 except ImportError:
     import simplejson as json  # NOQA
 
-OCTOGIT = colored.blue('octogit')
 
 ISSUES_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues?page=%s'
 CREATE_ISSUE_ENDPOINT = 'https://api.github.com/repos/%s/%s/issues'
@@ -97,7 +96,7 @@ def git_add():
 def local_already(repo_name):
     # mkdir repo_name
     if os.path.exists('/'.join([os.getcwd(), repo_name])):
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('the repository already exists locally.')))
         return True
     else:
@@ -107,7 +106,7 @@ def local_already(repo_name):
 def create_local_repo(username, repo_name):
     # mkdir repo_name
     if os.path.exists('/'.join([os.getcwd(), repo_name])):
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('the repository already exists locally.')))
     else:
         os.makedirs('/'.join([os.getcwd(), repo_name]))
@@ -125,13 +124,13 @@ def create_local_repo(username, repo_name):
         git_add_remote(username, repo_name)
         # push to master
         push_to_master()
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.green('this is your moment of glory; Be a hero.')))
 
 
 def close_issue(user, repo, number):
     if not have_credentials():
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(-1)
     update_issue = UPDATE_ISSUE % (user, repo, number)
@@ -146,7 +145,7 @@ def close_issue(user, repo, number):
         puts('{0}.'.format(colored.red('closed')))
     else:
         puts('{0}. {1}'.format(
-                OCTOGIT,
+                colored.blue('octogit'),
                 colored.red("You either aren't allowed to close repository "
                             "or you need to login in silly.")
             )
@@ -164,7 +163,7 @@ def view_issue(user, repo, number):
 
 def create_repository(project_name, description, organization=None):
     if not have_credentials():
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create a repository, you need to login.')))
         sys.exit(1)
 
@@ -197,13 +196,13 @@ def create_repository(project_name, description, organization=None):
         errors = post_response.get('errors')
         if errors and errors[0]['message'] == 'name already exists on this account':
             puts('{0}. {1}'.format(
-                    OCTOGIT,
+                    colored.blue('octogit'),
                     colored.red('repository named this already exists on github')
                 )
             )
         else:
             puts('{0}. {1}'.format(
-                    OCTOGIT,
+                    colored.blue('octogit'),
                     colored.red('something went wrong. perhaps you need to login?')
                 )
             )
@@ -217,7 +216,7 @@ def find_github_remote():
     stdout, sterr = proc.communicate()
 
     if not stdout:
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('You need to be inside a valid git repository.')))
         sys.exit(0)
 
@@ -275,12 +274,12 @@ def get_issues(user, repo, assigned=None):
             raise ValueError(connect.content)
 
         if not data:
-            puts('{0}. {1}'.format(OCTOGIT,
+            puts('{0}. {1}'.format(colored.blue('octogit'),
                 colored.cyan('Looks like you are perfect welcome to the club.')))
             break
 
         elif 'message' in data:
-            puts('{0}. {1}'.format(OCTOGIT,
+            puts('{0}. {1}'.format(colored.blue('octogit'),
                                    colored.red(data['message'])))
             sys.exit(1)
 
@@ -296,14 +295,14 @@ def get_issues(user, repo, assigned=None):
                 width.append([colored.red('('+ issue['user']['login']+')'), None])
                 print_(columns(*width))
             except IndexError as err:
-                puts('{0}.Error: {1} triggered -- {2}'.format(OCTOGIT,
+                puts('{0}.Error: {1} triggered -- {2}'.format(colored.blue('octogit'),
                                                               colored.red('Keyerror'),
                                                               colored.red(err))) 
 
 
 def create_issue(user, repo, issue_name, description):
     if not have_credentials():
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('in order to create an issue, you need to login.')))
         sys.exit(1)
 
@@ -312,9 +311,9 @@ def create_issue(user, repo, issue_name, description):
 
     response = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
     if response.status_code == 201:
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
     else:
-        puts('{0}. {1}'.format(OCTOGIT,
+        puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('something went wrong. perhaps you need to login?')))
         sys.exit(-1)

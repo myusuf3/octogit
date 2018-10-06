@@ -6,7 +6,6 @@ import requests
 from clint.textui import colored, puts
 from six.moves import configparser
 
-from octogit.core import OCTOGIT
 
 try:
     import json
@@ -130,7 +129,7 @@ def login(username, password):
         sys.exit()
     else:
         msg = '{}. {}'.format(
-            OCTOGIT,
+            colored.blue('octogit'),
             colored.red('Do you even have a Github account? Bad Credentials')
         )
         puts(msg)
