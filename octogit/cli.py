@@ -7,16 +7,23 @@ this file contains all the helper cli commands for octogit
 import os
 import re
 import sys
+
 import requests
-
-from six.moves import input
-from docopt import docopt
 from clint.textui import colored, puts, indent
+from docopt import docopt
+from six.moves import input
 
-from .core import (get_issues, get_single_issue, create_repository,
-                   close_issue, view_issue, create_issue, find_github_remote)
-from .config import login, create_config, CONFIG_FILE
-
+from octogit.config import login, create_config, CONFIG_FILE
+from octogit.core import (
+    OCTOGIT,
+    get_issues,
+    get_single_issue,
+    create_repository,
+    close_issue,
+    view_issue,
+    create_issue,
+    find_github_remote,
+)
 
 GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
 
@@ -28,7 +35,7 @@ def version():
 
 def get_help():
     puts('{0}. version {1} by Mahdi Yusuf {2}'.format(
-            colored.blue('octogit'),
+            OCTOGIT,
             version(),
             colored.green('@myusuf3')))
     puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
@@ -61,7 +68,6 @@ def get_parent_repository(username_repo):
 
 
 def get_username_and_repo(url):
-
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
@@ -121,7 +127,7 @@ def begin():
 
     elif arguments['create']:
         if arguments['<repo>'] is None:
-            puts('{0}. {1}'.format(colored.blue('octogit'),
+            puts('{0}. {1}'.format(OCTOGIT,
                 colored.red('You need to pass both a project name and description')))
 
         else:
@@ -136,7 +142,7 @@ def begin():
         username, url = get_username_and_repo(url)
         if arguments['create']:
             if ['<issue-title>'] is None:
-                puts('{0}. {1}'.format(colored.blue('octogit'),
+                puts('{0}. {1}'.format(OCTOGIT,
                     colored.red('You need to pass an issue title')))
                 sys.exit(-1)
 
@@ -180,7 +186,7 @@ def begin():
         password = arguments['password'] or None
         if password is None:
             import getpass
-            password = getpass.getpass("Password for %s: " % username)
+            password = getpass.getpass("Password for {}: ".format(username))
 
         login(username, password)
     else:

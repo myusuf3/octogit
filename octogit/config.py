@@ -1,9 +1,12 @@
 import os
 import sys
-import ConfigParser
 
 import requests
+
 from clint.textui import colored, puts
+from six.moves import configparser
+
+from octogit.core import OCTOGIT
 
 try:
     import json
@@ -12,15 +15,18 @@ except ImportError:
 
 CONFIG_FILE = os.path.expanduser('~/.config/octogit/config.ini')
 # ran the first time login in run
-# config = ConfigParser.ConfigParser()
+# config = configparser.ConfigParser()
 
 
 def get_parser():
     try:
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
     except Exception as e:
-        puts(colored.red("ERROR: Attempting to get config parser failed: {}".format(e)))
+        puts(colored.red(
+                "ERROR: Attempting to get config parser failed: {}".format(e)
+            )
+        )
         config = None
     return config
 
@@ -34,20 +40,19 @@ def commit_changes(config):
 
 
 def create_config():
-    # If this returns False, file does not exist
+    """Create a configuration file for octogit."""
     if os.path.isfile(CONFIG_FILE):
-        pass
-    else:
-        # need an extra check here in cases where the path exists
-        # but the file doesn't (if it was renamed)
-        if not os.path.exists(os.path.dirname(CONFIG_FILE)):
-            os.makedirs(os.path.dirname(CONFIG_FILE))
-        open(CONFIG_FILE, 'w').close()
-        config = get_parser()
-        config.add_section('octogit')
-        config.set('octogit', 'username', '')
-        config.set('octogit', 'token', '')
-        commit_changes(config)
+        return
+    # Make sure the path exists, and if it doesn't, create it.
+    if not os.path.exists(os.path.dirname(CONFIG_FILE)):
+        os.makedirs(os.path.dirname(CONFIG_FILE))
+    # touch the config file.
+    open(CONFIG_FILE, 'a').close()
+    config = get_parser()
+    config.add_section('octogit')
+    config.set('octogit', 'username', '')
+    config.set('octogit', 'token', '')
+    commit_changes(config)
 
 
 def get_token():
@@ -55,15 +60,17 @@ def get_token():
     # Catch edgecase where user hasn't migrated to tokens
     try:
         return config.get('octogit', 'token')
-    except ConfigParser.NoOptionError:
-        if get_username() != "":
-            puts(colored.green("We're just migrating your account from plaintext passwords to OAuth tokens"))
-            login(get_username(), config.get('octogit', 'password'))
-            config.remove_option('octogit', 'password')
-            puts(colored.green("Pretty spiffy huh?"))
-            return config.get('octogit', 'token')
-        else:
+    except configparser.NoOptionError:
+        if get_username() == "":
             raise
+        puts(colored.green(
+            "We're just migrating your account from plaintext passwords to "
+            "OAuth tokens"
+        ))
+        login(get_username(), config.get('octogit', 'password'))
+        config.remove_option('octogit', 'password')
+        puts(colored.green("Pretty spiffy huh?"))
+        return config.get('octogit', 'token')
 
 
 def get_username():
@@ -102,22 +109,30 @@ def set_username(username):
 
 
 def login(username, password):
-    body = json.dumps({"note": "octogit",
-                       "note_url": "https://github.com/myusuf3/octogit",
-                       "scopes": ["repo"]})
-    r = requests.post('https://api.github.com/authorizations',
-                      auth=(username, password), data=body)
-    if r.status_code == 201:
+    payload = {
+        "note": "octogit",
+        "note_url": "https://github.com/myusuf3/octogit",
+        "scopes": ["repo"]
+    }
+    response = requests.post(
+        'https://api.github.com/authorizations',
+        auth=(username, password),
+        json=payload,
+    )
+    if response.status_code == 201:
         puts(colored.green('You have successfully been authenticated with Github'))
-        data = json.loads(r.content)
+        data = json.loads(response.content)
         token = data["token"]
         set_username(username)
         set_token(token)
-    elif r.status_code == 422:
+    elif response.status_code == 422:
         puts(colored.red('An access token already exists! Exiting...')) 
         sys.exit()
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-                               colored.red('Do you even have a Github account? Bad Credentials')))
+        msg = '{}. {}'.format(
+            OCTOGIT,
+            colored.red('Do you even have a Github account? Bad Credentials')
+        )
+        puts(msg)
         sys.exit(3)
 
