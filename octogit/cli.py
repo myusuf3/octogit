@@ -18,14 +18,17 @@ from .core import (get_issues, get_single_issue, create_repository,
 from .config import login, create_config, commit_changes, CONFIG_FILE
 
 
-GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
-
 def version():
+    """Stringify the version tuple.
+
+    :rtype: str
+    """
     from . import __version__
     return ".".join(str(x) for x in __version__)
 
 
 def get_help():
+    """Generate a help output for the CLI command."""
     puts('{0}. version {1} by Mahdi Yusuf {2}'.format(
             colored.blue('octogit'),
             version(),
@@ -46,43 +49,29 @@ def get_help():
         puts('\n')
 
 
-def get_parent_repository(username_repo):
-    username, repo = username_repo
-    url = GIT_REPO_ENDPOINT % (username, repo)
-    response = requests.get(url)
-    data = response.json()
-    try:
-        parent = data['parent']['full_name']
-        username_repo = parent.split('/')
-    except KeyError:
-        pass
-    return username_repo
-
-
 def get_username_and_repo(url):
+    """Parse the user name and repository from the given ``url``.
 
+    There are 3 types of URLs we expect::
+
+        1. http paths ("http://www.github.com/myusuf3/delorean")
+        2. ssh paths ("git@github.com:[/]myusuf3/delorean")
+        3. git protocol paths ("git:github.com/myusuf3/delorean.git")
+
+    For each there is a regex expression to extract the user name and repository
+    name from such an URL.
+
+    :param str url: The URL to parse from.
+    :rtype: Tuple[str, str]
+    """
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
-    m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
-    if m:
-        return m.groups()
-    else:
-        # matching origin of this type
-        # git@github.com:[/]myusuf3/delorean.git
-        username_repo = url.split(':')[1].replace('.git', '').split('/')
-        # Handle potential leading slash after :
-        if username_repo[0] == '':
-            username_repo = username_repo[1:]
-        if len(username_repo) == 2:
-            info = username_repo
-        else:
-            # matching url of this type
-            # git://github.com/myusuf3/delorean.git
-            username_repo = url.split('/')[3:]
-            username_repo[1] = username_repo[1].replace('.git', '')
-            info = username_repo
-    parent_repo = get_parent_repository(info)
-    return parent_repo
+    web_addr = re.match("^.+?github.com/(?P<user>\w+)/(?P<repo>\w+)\/?$", url)
+    ssh_addr = re.match(r"^.+github.com(:/|:)(?P<user>\w+)/(?P<repo>\w+)", url)
+    git_prot_addr = re.match(r"^git://github.com/(?P<user>\w+)/(?P<repo>\w+)", url)
+    for match in (web_addr, ssh_addr, git_prot_addr):
+        if match:
+            return match.group('user'), match.group('repo')
 
 
 def begin():
