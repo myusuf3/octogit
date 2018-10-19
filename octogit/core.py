@@ -5,16 +5,20 @@ octogit
 This file contains stuff for github api
 """
 
-import os
 import io
+import os
 import re
-import sys
 import subprocess
+import sys
 import webbrowser
-import requests
-from clint.textui import colored, puts, columns
 
-from .config import get_username, get_headers, have_credentials
+import requests
+
+from clint.textui import colored, puts, columns
+from six import print_
+from six.moves import xrange
+
+from octogit.config import get_username, get_headers, have_credentials
 
 try:
     import json
@@ -32,8 +36,8 @@ UPDATE_ISSUE = 'https://api.github.com/repos/%s/%s/issues/%s'
 
 
 def valid_credentials():
-    r = requests.get('https://api.github.com', headers=get_headers())
-    if r.status_code == 200:
+    response = requests.get('https://api.github.com', headers=get_headers())
+    if response.status_code == 200:
         return True
     else:
         return False
@@ -75,7 +79,10 @@ def git_add_remote(username, repo_name):
 
 
 def git_initial_commit():
-    cmd = ["git", "commit", "-am", "this repository now with more tentacles care of octogit"]
+    cmd = [
+        "git", "commit", "-am",
+        "this repository now with more tentacles care of octogit"
+    ]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.communicate()
 
@@ -105,13 +112,13 @@ def create_local_repo(username, repo_name):
         os.makedirs('/'.join([os.getcwd(), repo_name]))
         # cd repo_name
         os.chdir('/'.join([os.getcwd(), repo_name]))
-        #git init
+        # git init
         git_init(os.getcwd())
         # create readme
         create_octogit_readme()
         # add readme
         git_add()
-        #initial commit
+        # initial commit
         git_initial_commit()
         # add remote
         git_add_remote(username, repo_name)
@@ -128,12 +135,21 @@ def close_issue(user, repo, number):
         sys.exit(-1)
     update_issue = UPDATE_ISSUE % (user, repo, number)
     post_dict = {'state': 'close'}
-    r = requests.post(update_issue, headers=get_headers(), data=json.dumps(post_dict))
-    if r.status_code == 200:
+    response = requests.post(
+        update_issue,
+        headers=get_headers(),
+        data=json.dumps(post_dict)
+    )
+
+    if response.status_code == 200:
         puts('{0}.'.format(colored.red('closed')))
     else:
-        puts('{0}. {1}'.format(colored.blue('octogit'),
-            colored.red("You either aren't allowed to close repository or you need to login in silly.")))
+        puts('{0}. {1}'.format(
+                colored.blue('octogit'),
+                colored.red("You either aren't allowed to close repository "
+                            "or you need to login in silly.")
+            )
+        )
         sys.exit(-1)
 
 
@@ -141,7 +157,6 @@ def view_issue(user, repo, number):
     """
     Displays the specified issue in a browser
     """
-
     github_view_url = SINGLE_ISSUE_PAGE % (user, repo, number)
     webbrowser.open(github_view_url)
 
@@ -154,27 +169,43 @@ def create_repository(project_name, description, organization=None):
 
     if local_already(project_name):
         sys.exit(1)
-    post_dict = {'name': project_name, 'description': description, 'homepage': '', 'private': False, 'has_issues': True, 'has_wiki': True, 'has_downloads': True}
+    post_dict = {
+        'name': project_name,
+        'description': description,
+        'homepage': '',
+        'private': False,
+        'has_issues': True,
+        'has_wiki': True,
+        'has_downloads': True
+    }
+
     if organization:
         post_url = 'https://api.github.com/orgs/{0}/repos'.format(organization)
     else:
         post_url = 'https://api.github.com/user/repos'
-    r = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
-    if r.status_code == 201:
+
+    response = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
+    if response.status_code == 201:
         if organization:
             create_local_repo(organization, project_name)
         else:
             create_local_repo(get_username(), project_name)
     else:
         # Something went wrong
-        post_response = json.loads(r.content)
+        post_response = json.loads(response.content)
         errors = post_response.get('errors')
         if errors and errors[0]['message'] == 'name already exists on this account':
-            puts('{0}. {1}'.format(colored.blue('octogit'),
-                colored.red('repository named this already exists on github')))
+            puts('{0}. {1}'.format(
+                    colored.blue('octogit'),
+                    colored.red('repository named this already exists on github')
+                )
+            )
         else:
-            puts('{0}. {1}'.format(colored.blue('octogit'),
-                colored.red('something went wrong. perhaps you need to login?')))
+            puts('{0}. {1}'.format(
+                    colored.blue('octogit'),
+                    colored.red('something went wrong. perhaps you need to login?')
+                )
+            )
             sys.exit(-1)
 
 
@@ -253,7 +284,7 @@ def get_issues(user, repo, assigned=None):
             sys.exit(1)
 
         for issue in data:
-            #skip pull requests
+            #  skip pull requests
             try:
                 if issue['pull_request']['html_url']:
                     continue
@@ -262,11 +293,12 @@ def get_issues(user, repo, assigned=None):
                     issue['title'] = issue['title'].encode('utf-8')
                 width.append([issue['title'], 80])
                 width.append([colored.red('('+ issue['user']['login']+')'), None])
-                print columns(*width)
+                print_(columns(*width))
             except IndexError as err:
                 puts('{0}.Error: {1} triggered -- {2}'.format(colored.blue('octogit'),
                                                               colored.red('Keyerror'),
                                                               colored.red(err))) 
+
 
 def create_issue(user, repo, issue_name, description):
     if not have_credentials():
@@ -277,8 +309,8 @@ def create_issue(user, repo, issue_name, description):
     post_url = CREATE_ISSUE_ENDPOINT % (user, repo)
     post_dict = {'title': issue_name, 'body': description}
 
-    r = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
-    if r.status_code == 201:
+    response = requests.post(post_url, headers=get_headers(), data=json.dumps(post_dict))
+    if response.status_code == 201:
         puts('{0}. {1}'.format(colored.blue('octogit'),
             colored.red('New issue created!')))
     else:
