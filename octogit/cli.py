@@ -4,8 +4,8 @@ octogit
 this file contains all the helper cli commands for octogit
 
 """
-import os
 import re
+<<<<<<< Updated upstream
 import sys
 import requests
 
@@ -16,6 +16,11 @@ from clint.textui import colored, puts, indent
 from .core import (get_issues, get_single_issue, create_repository,
                    close_issue, view_issue, create_issue, find_github_remote)
 from .config import login, create_config, commit_changes, CONFIG_FILE
+=======
+
+import requests
+
+>>>>>>> Stashed changes
 
 
 GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
@@ -23,27 +28,6 @@ GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
 def version():
     from . import __version__
     return ".".join(str(x) for x in __version__)
-
-
-def get_help():
-    puts('{0}. version {1} by Mahdi Yusuf {2}'.format(
-            colored.blue('octogit'),
-            version(),
-            colored.green('@myusuf3')))
-    puts('{0}: http://github.com/myusuf3/octogit'.format(colored.yellow('source')))
-
-    puts('\n{0}:'.format(colored.cyan('tentacles')))
-    with indent(4):
-        puts(colored.green('octogit login'))
-        puts(colored.green("octogit create <repo> 'description'"))
-        puts(colored.green("octogit create <repo> 'description' <organization>"))
-        puts(colored.green('octogit issues [--assigned]'))
-        puts(colored.green('octogit issues'))
-        puts(colored.green("octogit issues create 'issue title' 'description'"))
-        puts(colored.green('octogit issues <number>'))
-        puts(colored.green('octogit issues <number> close'))
-        puts(colored.green('octogit issues <number> view'))
-        puts('\n')
 
 
 def get_parent_repository(username_repo):
@@ -83,6 +67,7 @@ def get_username_and_repo(url):
             info = username_repo
     parent_repo = get_parent_repository(info)
     return parent_repo
+<<<<<<< Updated upstream
 
 
 def begin():
@@ -185,3 +170,5 @@ def begin():
     else:
         get_help()
         sys.exit(0)
+=======
+>>>>>>> Stashed changes
