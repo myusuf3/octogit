@@ -54,7 +54,7 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-dependencies = ['clint2','requests>=1.0', 'docopt']
+dependencies = ['clint2','requests>=1.0', 'docopt', 'six']
 
 setup(
     name='octogit',
@@ -81,5 +81,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
     ),
     )

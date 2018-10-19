@@ -8,6 +8,7 @@ import re
 
 import requests
 
+
 GIT_REPO_ENDPOINT = 'https://api.github.com/repos/%s/%s'
 
 
@@ -30,7 +31,6 @@ def get_parent_repository(username_repo):
 
 
 def get_username_and_repo(url):
-
     # matching origin of this type
     # http://www.github.com/myusuf3/delorean
     m = re.match("^.+?github.com/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\/?$", url)
