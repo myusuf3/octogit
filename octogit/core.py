@@ -223,7 +223,7 @@ def find_github_remote():
     remotes = stdout.strip().split('\n')
     for line in remotes:
         name, url, _ = line.split()
-        if 'github.com' in url and name == 'origin':
+        if 'github.com' in url and name == 'origin' or name=='gh' or name=='github':
             return url
     else:
         puts(colored.red('This repository has no Github remotes'))
